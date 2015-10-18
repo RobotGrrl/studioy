@@ -1,0 +1,27 @@
+source,target,value
+Consumers,Federal Government,0.5
+Consumers,Cleantech Companies,0.5
+Consumers,Energy Tech Retailers,0.5
+Consumers,Independent Innovators,0.5
+Consumers,IESO,0.5
+Consumers,NGOs,0.5
+Consumers,Electricity Retailers,0.5
+Consumers,University R&D,0.5
+Consumers,Hydro One,0.5
+Consumers,Provincial Government,0.5
+
+Federal Government,University R&D,0.5
+Federal Government,Electricity Generators (OPG),0.5
+Federal Government,Provincial Government,0.5
+
+Cleantech Companies,Energy Tech Retailers,0.5
+
+IESO,Hydro One,0.5
+
+University R&D,Electricity Generators (OPG),0.5
+
+Hydro One,Electricity Generators (OPG),0.5
+Hydro One,Provincial Government,0.5
+
+OEB,Hydro One,0.5
+OEB,Provincial Government,0.5
