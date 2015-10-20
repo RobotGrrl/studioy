@@ -1,7 +1,21 @@
 #include <Wire.h>
+#include <Servo.h>
 #include "rgb_lcd.h"
 
 rgb_lcd lcd;
+Servo myservo;
+
+// todo: need to unsolder pin 10 and place the servo there
+// move wire 10 to pin 7
+
+// pins
+const int button_L = 8;
+const int button_R = 9;
+const int led_L = 11;
+const int led_R = 7;
+const int servo_pin = 10;
+const int spkr = 6;
+// lcd on i2c
 
 int mode = 0;
 long last_switch = 0;
@@ -14,9 +28,15 @@ void setup() {
   Serial.begin(9600);
   Serial.print("hello");
   lcd.begin(16,2);
+  myservo.attach(servo_pin);
+  
 }
 
 void loop() {
+
+
+  servoTest();
+
 
   current_time = millis();
 
@@ -109,6 +129,20 @@ void gridMalfunction() {
   lcd.print("BEEP BEEP BEEEEP");
 }
 
+
+
+void servoTest() {
+ for(int i=0; i<180; i++) {
+    myservo.write(i);
+    delay(10);
+  }
+  delay(100);
+  for(int i=180; i>0; i--) {
+    myservo.write(i);
+    delay(10);
+  }
+  delay(100);
+}
 
 
 
