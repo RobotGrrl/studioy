@@ -2,6 +2,7 @@
 # starts at midnight, not sure what timezone
 # 
 
+import math
 import xml.etree.ElementTree
 
 root = xml.etree.ElementTree.parse('ontario_demand_multiday-2.xml').getroot()
@@ -10,7 +11,14 @@ root = xml.etree.ElementTree.parse('ontario_demand_multiday-2.xml').getroot()
 # print("\n\n")
 # print(root.attrib)
 
-global start_date
+start_date = ""
+num_hours = 24
+num_mins = 60
+data_per_day = (24*60)/5
+data_per_set = data_per_day*6 # why do we have to multiply by 6? off by one somewhere
+print "total number of data points in this set = %d" % data_per_set
+print "num of data points in one day = %d" % data_per_day
+
 
 for child in root:
   if child.tag == "StartDate":
@@ -24,68 +32,46 @@ for child in root:
     # all the data for 5 mins
     if dataset_type == "5_Minute":
 
-      i = 0
-      j = 0
-      deedee = ""
-      strstr = ""
-      for datum in child:
-        i = i+1
-        for chichi in datum:
-          if chichi.tag == "Value":
-            if chichi.text != None:
-              j = j+1
-              strstr = chichi.text
-        deedee = datum
-
-
-
-      today_demands = []
+      today_points = []
       new_index = 0
       
-      for i in range(0, 288):
-        today_index = 1728-i
-        temp = child[today_index]
+      for i in range(0, data_per_day+1):  # 0 - 288+1
+        today_index = data_per_set-i      # 1728 - i (max 288)
+        temp = child[today_index]         # 1728 (newest) - 1440 (oldest)
         demand_value = temp[0].text
-        print demand_value
+        if demand_value != None:
+          today_points.append(demand_value)
         
-        # if demand_value != None:
-        #   today_demands[new_index] = demand_value
-        #   new_index = new_index+1
 
-        #print "demand value = %s" % demand_value
-
-      # now let's double check the value
-      # 1728-288=1440
-
-      bleep = child[1728-288]
-      bleepy = bleep[0]
-      print "bleep: %s " % bleepy.text
+      print "today_points = %d" % len(today_points)
 
 
-      print "wat"
 
-      print "counts: %d" % i
-      print "last data index: %d" % j
-      # print "last data: %s" % strstr
+      # ----------
+      # determining the time of the most current data point
+      # ----------
 
-      # bloop = "a"
+      total_mins = len(today_points)*5
+      total_hours = float(total_mins)/60
 
-      # bloop = "a"
-  	  
-      # bloop = "a"
+      # print "total num of mins: %d " % total_mins
+      # print "total num of hours: %f " % math.floor(total_hours)
 
-      # remaining = i-j
-      # mins_today = remaining*5
-      # hours_today = mins_today/60
-      # current_hour = 24-hours_today
-      # current_hour_12 = current_hour-12
-      # am_pm = "am"
-      # if current_hour >= 12:
-      #   am_pm = "pm"
+      time_hours = math.floor(total_hours)
+      time_mins = total_mins-(math.floor(total_hours)*60)
+      meridian = ""
 
-      # print "remaining data: %d" % remaining
-      # print "mins_today: %d" % mins_today
-      # print "hours_today: %d" % hours_today
+      if time_hours == 12:
+        meridian = "pm"
+      elif time_hours > 12:
+        time_hours = time_hours-12
+        meridian = "pm"
+      elif time_hours < 12:
+        meridian = "am"
+
+      print "%d:%d %s" % (time_hours, time_mins, meridian)
+
+
 
 
       
@@ -101,13 +87,8 @@ for child in root:
 print(start_date)
 
 
-num_hours = 24
-num_mins = 60
-num_5mins_day = (24*60)/5
-times_5_days = num_5mins_day*6
-print "total number of data points possible = %d" % times_5_days
-print "num of data points in one day = %d" % num_5mins_day
-# why do we have to multiply by 6? off by one somewhere
+
+
 
 
 # for atype in e.findall('type'):
