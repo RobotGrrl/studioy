@@ -107,6 +107,30 @@ for child in root:
 
 
 
+      # -------
+      # reversing it...
+      # -------
+
+      result_data = []
+
+      print len(all_data)
+
+      for i in range(0, len(all_data)):
+        result_data.append( all_data[ len(all_data)-1-i ] )
+
+
+      print result_data[1]
+      print all_data[ len(all_data)-2 ]
+
+
+      # -----------
+      # export the dictionary to csv now
+      # -----------
+
+      #for item in all_data:
+
+
+
       print all_data[0]
       print all_data[1]
       print all_data[2]
