@@ -29,13 +29,19 @@ void setup() {
   Serial.print("hello");
   lcd.begin(16,2);
   myservo.attach(servo_pin);
-  
+  pinMode(button_L, INPUT);
+  pinMode(button_R, INPUT);
+  pinMode(led_L, INPUT);
+  pinMode(led_R, INPUT);
+  pinMode(spkr, INPUT);
 }
 
 void loop() {
 
+  
 
-  servoTest();
+
+  //servoTest();
 
 
   current_time = millis();
