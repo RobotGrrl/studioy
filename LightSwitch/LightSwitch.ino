@@ -26,7 +26,13 @@ long current_time = 0;
 int breath = 0;
 boolean breath_dir = true;
 long last_incr = 0;
-
+long last_update = 0;
+boolean switch_a = false;
+boolean switch_b = false;
+boolean hold_a = false;
+boolean hold_b = false;
+long last_button_L_press = 0;
+long last_button_R_press = 0;
 
 void setup() {
   Wire.begin();
@@ -43,15 +49,48 @@ void setup() {
 
 void loop() {
 
-  readDHT22();
-  statusDisplay();
+  current_time = millis();
+
+  if(current_time-last_update >= 1000) {
+    readDHT22();
+    statusDisplay();
+    last_update = current_time;
+  }
+
+  if(digitalRead(button_L) == HIGH) {
+    last_button_L_press = current_time;
+    hold_a = true;
+  }
+  if(digitalRead(button_R) == HIGH) {
+    last_button_R_press = current_time;
+    hold_b = true;
+  }
+
+  if(current_time-last_button_L_press > 20 && hold_a == true) {
+    if(switch_a) {
+      digitalWrite(led_L, HIGH);  
+    } else {
+      digitalWrite(led_L, LOW);
+    }
+    switch_a = !switch_a;
+    hold_a = false;
+  }
+  
+  if(current_time-last_button_R_press > 20 && hold_b == true) {
+    if(switch_b) {
+      digitalWrite(led_R, HIGH);  
+    } else {
+      digitalWrite(led_R, LOW);
+    }
+    switch_b = !switch_b;
+    hold_b = false;
+  }
+
 
   /*  
   //printDate();
   //servoTest();
 
-  current_time = millis();
-  
   if(current_time-last_switch >= 3000) {
     mode++;
     if(mode > 3) mode = 0;
@@ -108,8 +147,8 @@ void loop() {
   }
   */
  
-  Serial.print("~");
-  delay(1000);
+  //Serial.print("~");
+  //delay(100);
   
 
 }
