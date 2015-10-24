@@ -99,9 +99,22 @@ for child in root:
           time_str = "%d:%d %s" % (time_hours, time_mins, meridian)
 
         # is there a better way to do this?
+        #print all_data[(len(today_points)-1)-i]
         meep = all_data[(len(today_points)-1)-i].copy()
+        #print meep
         meep['time'] = time_str
-        all_data[i] = meep
+        #print meep
+        all_data[i] = meep.copy() # added the .copy() after
+        #print all_data[i]
+
+        # {'demand': '12732.00'}
+        # {'demand': '12732.00'}
+        # {'time': '0:00 am', 'demand': '12732.00'}
+        # {'time': '0:00 am', 'demand': '12732.00'}
+        # {'demand': '12697.40'}
+        # {'demand': '12697.40'}
+        # {'time': '0:05 am', 'demand': '12697.40'}
+        # {'time': '0:05 am', 'demand': '12697.40'}
 
         #print time_str
 
@@ -113,13 +126,36 @@ for child in root:
 
       result_data = []
 
-      print len(all_data)
+      print "len of all data: %d" % len(all_data)
 
       for i in range(0, len(all_data)):
-        result_data.append( all_data[ len(all_data)-1-i ] )
+        #print all_data[ len(all_data)-1-i ]
+        #meep = all_data[ len(all_data)-1-i ].copy()
+        #print meep
+        #result_data.append(meep)
+        #print result_data[ len(result_data)-1 ]
 
 
-      print result_data[1]
+        # {'demand': '12732.00', 'time': '4:25 pm'}
+        # {'time': '4:25 pm', 'demand': '12732.00'}
+        # {'time': '4:25 pm', 'demand': '12732.00'}
+
+        # so why is it switching the demand, but not the time?
+
+        meep = {}
+        meep['demand'] = all_data[ len(all_data)-1-i ]['demand']
+        meep['time'] = all_data[ len(all_data)-1-i ]['time']
+        print meep
+        result_data.append(meep)
+        print result_data[ len(result_data)-1 ]
+
+        # {'time': '4:25 pm', 'demand': '12732.00'}
+        # {'time': '4:25 pm', 'demand': '12732.00'}
+
+        # i'm probably making a stupid error somewhere but just don't see it yet
+
+
+      print "result data: %s" % str(result_data[1])
       print all_data[ len(all_data)-2 ]
 
 
@@ -134,6 +170,8 @@ for child in root:
       print all_data[0]
       print all_data[1]
       print all_data[2]
+
+      print all_data[ len(all_data)-2 ]
 
       
     elif dataset_type == "Actual":

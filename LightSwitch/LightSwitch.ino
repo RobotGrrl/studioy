@@ -58,8 +58,14 @@ void loop() {
   }
 
   if(digitalRead(button_L) == HIGH) {
-    last_button_L_press = current_time;
-    hold_a = true;
+    
+    if(hold_a) {
+      
+    } else {
+      hold_a = true;
+      last_button_L_press = current_time;
+    }
+    
   }
   if(digitalRead(button_R) == HIGH) {
     last_button_R_press = current_time;
