@@ -1,11 +1,22 @@
 # dataset begins 5 days previous to the day accessed
 # starts at midnight, not sure what timezone
 # 
+#
+#
+# the timestamps generated are off by 1 hour
+# guessing it's a difference between daylight savings time
 
 import math
 import xml.etree.ElementTree
+import os
+import urllib
 
-root = xml.etree.ElementTree.parse('ontario_demand_multiday-2.xml').getroot()
+opener = urllib.FancyURLopener({})
+f = opener.open("http://www.ieso.ca/Data/data/ontario_demand_multiday.xml")
+
+root = xml.etree.ElementTree.parse(f).getroot()
+
+#root = xml.etree.ElementTree.parse('ontario_demand_multiday-2.xml').getroot()
 
 # print(root.tag)
 # print("\n\n")
@@ -134,12 +145,22 @@ for child in root:
 
 
 
-      # -----------
+      # ---------------
       # export the dictionary to csv now
-      # -----------
+      # ---------------
 
-      #for item in all_data:
+      dir1 = os.path.dirname(os.path.realpath(__file__))
+      fname = "5min_demand.csv"
+      path1 = "%s/%s" % (dir1, fname)
 
+      f = open(path1, 'w+')
+      f.write("Time, Demand\n")
+
+      for i in range(0, all_data_len):
+        str1 = "%s, %s\n" % (all_data[i]['time'], all_data[i]['demand'])
+        f.write(str1)
+
+      f.close()
 
 
       
