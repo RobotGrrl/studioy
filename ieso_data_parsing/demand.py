@@ -33,40 +33,36 @@ for child in root:
     if dataset_type == "5_Minute":
 
 
-      # ----------
+      # --------------
       # extracting the value
-      # ----------
+      # --------------
 
       all_data = []
-      today_points = []
-      new_index = 0
 
       for i in range(0, data_per_day+1):  # 0 - 288+1
         today_index = data_per_set-i      # 1728 - i (max 288)
         temp = child[today_index]         # 1728 (newest) - 1440 (oldest)
         demand_value = temp[0].text
         if demand_value != None:
-          today_points.append(demand_value)
-
           data_point = {}
           data_point['demand'] = demand_value
-          print data_point['demand']
+          data_point['time'] = ""
           all_data.append(data_point)
 
+      
 
-      print "today_points = %d" % len(today_points)
+      # ---------------
+      # generating the timestamps from the most current data point
+      # ---------------
 
+      all_data_len = len(all_data)
+      print "len of all data %d" % all_data_len
 
-      print all_data
+      all_time_strs = []
 
+      for i in range(0, all_data_len):
 
-      # ----------
-      # determining the time of the most current data point
-      # ----------
-
-      for i in range(0, len(today_points)):
-
-        total_mins = len(today_points)*5
+        total_mins = all_data_len*5
         total_hours = float(total_mins)/60
 
         # print "total num of mins: %d " % total_mins
@@ -78,11 +74,6 @@ for child in root:
         time_hours = math.floor(the_hours)
         time_mins = the_mins-(math.floor(the_hours)*60)
         meridian = ""
-
-        # previous version
-        # time_hours = math.floor(total_hours)
-        # time_mins = total_mins-(math.floor(total_hours)*60)
-        # meridian = ""
 
         if time_hours == 12:
           meridian = "pm"
@@ -98,65 +89,49 @@ for child in root:
         else:
           time_str = "%d:%d %s" % (time_hours, time_mins, meridian)
 
-        # is there a better way to do this?
-        #print all_data[(len(today_points)-1)-i]
-        meep = all_data[(len(today_points)-1)-i].copy()
-        #print meep
-        meep['time'] = time_str
-        #print meep
-        all_data[i] = meep.copy() # added the .copy() after
-        #print all_data[i]
-
-        # {'demand': '12732.00'}
-        # {'demand': '12732.00'}
-        # {'time': '0:00 am', 'demand': '12732.00'}
-        # {'time': '0:00 am', 'demand': '12732.00'}
-        # {'demand': '12697.40'}
-        # {'demand': '12697.40'}
-        # {'time': '0:05 am', 'demand': '12697.40'}
-        # {'time': '0:05 am', 'demand': '12697.40'}
-
-        #print time_str
+        all_time_strs.append(time_str)
 
 
 
-      # -------
-      # reversing it...
-      # -------
+      # -------------
+      # updating the data dict with the timestamps
+      # -------------
+
+      for i in range(0, all_data_len):
+
+        ind = ( all_data_len-1 ) - i
+        update1 = {}
+        update1['time'] = all_time_strs[i]
+        all_data[ind].update(update1)
+
+
+
+      # ---------------
+      # printing it out - the reason why this has to be done
+      # in a sepparate loop is because of the direction the
+      # indices are going in the previous loop. there is a 
+      # midpoint where there's a mismatch between what data
+      # has and has not been added yet
+      # ----------------
+
+      for i in range(0, all_data_len):
+        print "%d: %s" % (i, str(all_data[i]))
+        
+
+
+      # ----------------
+      # reversing the data
+      # ----------------
 
       result_data = []
 
-      print "len of all data: %d" % len(all_data)
-
-      for i in range(0, len(all_data)):
-        #print all_data[ len(all_data)-1-i ]
-        #meep = all_data[ len(all_data)-1-i ].copy()
-        #print meep
-        #result_data.append(meep)
-        #print result_data[ len(result_data)-1 ]
-
-
-        # {'demand': '12732.00', 'time': '4:25 pm'}
-        # {'time': '4:25 pm', 'demand': '12732.00'}
-        # {'time': '4:25 pm', 'demand': '12732.00'}
-
-        # so why is it switching the demand, but not the time?
-
+      for i in range(0, all_data_len):
         meep = {}
-        meep['demand'] = all_data[ len(all_data)-1-i ]['demand']
-        meep['time'] = all_data[ len(all_data)-1-i ]['time']
-        print meep
+        meep['demand'] = all_data[ all_data_len-1-i ]['demand']
+        meep['time'] = all_data[ all_data_len-1-i ]['time']
         result_data.append(meep)
-        print result_data[ len(result_data)-1 ]
+        
 
-        # {'time': '4:25 pm', 'demand': '12732.00'}
-        # {'time': '4:25 pm', 'demand': '12732.00'}
-
-        # i'm probably making a stupid error somewhere but just don't see it yet
-
-
-      print "result data: %s" % str(result_data[1])
-      print all_data[ len(all_data)-2 ]
 
 
       # -----------
@@ -166,12 +141,6 @@ for child in root:
       #for item in all_data:
 
 
-
-      print all_data[0]
-      print all_data[1]
-      print all_data[2]
-
-      print all_data[ len(all_data)-2 ]
 
       
     elif dataset_type == "Actual":
