@@ -7,10 +7,13 @@ void updateOnButton() {
   // pressing / debouncing
   if(button_L_prev == LOW && button_L_current == HIGH && current_time-button_L_up > 20) {
     button_L_down = current_time;
+    button_L_state = 1;
+    onButtonPressed();
     Serial.println("ON!");
   }
 
   if(button_L_prev == HIGH && button_L_current == LOW && current_time-button_L_down > 20) {
+    button_L_state = 0;
     Serial.println("ON! released");
   }
 
@@ -18,8 +21,8 @@ void updateOnButton() {
   if(button_L_prev == HIGH && button_L_current == HIGH && current_time-button_L_down > 20) {
     // holding
     long holding_L = current_time-button_L_down;
-    Serial.print("ON! ");
-    Serial.println(holding_L);
+    button_L_state = 2;
+    Serial.print("ON! "); Serial.println(holding_L);
   }
   
 }
@@ -32,10 +35,13 @@ void updateOffButton() {
   // pressing / debouncing
   if(button_R_prev == LOW && button_R_current == HIGH && current_time-button_R_down > 20) {
     button_R_down = current_time;
+    button_R_state = 1;
+    offButtonPressed();
     Serial.print("OFF!");
   }
 
   if(button_R_prev == HIGH && button_R_current == LOW && current_time-button_R_down > 20) {
+    button_R_state = 0;
     Serial.println("OFF! released");
   }
 
@@ -43,9 +49,29 @@ void updateOffButton() {
   if(button_R_prev == HIGH && button_R_current == HIGH && current_time-button_R_down > 20) {
     // holding
     long holding_R = current_time-button_R_down;
-    Serial.print("OFF! ");
-    Serial.println(holding_R);
+    button_R_state = 2;
+    Serial.print("OFF! "); Serial.println(holding_R);
   }
   
 }
+
+void onButtonPressed() {
+
+  if(CURRENT_STATE == AMBIENT_STATE) {
+    // change to message state
+  }
+  
+}
+
+void offButtonPressed() {
+
+  if(CURRENT_STATE == AMBIENT_STATE) {
+    // brighten the lcd screen for 5 secs
+  }
+  
+}
+
+
+
+
 

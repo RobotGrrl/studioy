@@ -25,31 +25,24 @@ const int AMBIENT_STATE = 0;
 const int MESSAGE_STATE = 1;
 int CURRENT_STATE = AMBIENT_STATE;
 
+// vars
+int mode = 0;
+long current_time = 0;
+long last_update = 0;
+long last_print_date = 0;
+
+int button_L_state = 0; // 0 = released, 1 = pressed, 2 = released
 int button_L_prev = 0;
 int button_L_current = 0;
 long button_L_down = 0;
 long button_L_up = 0;
 
+int button_R_state = 0; // 0 = released, 1 = pressed, 2 = released
 int button_R_prev = 0;
 int button_R_current = 0;
 long button_R_down = 0;
 long button_R_up = 0;
 
-// vars
-int mode = 0;
-long last_switch = 0;
-long current_time = 0;
-int breath = 0;
-boolean breath_dir = true;
-long last_incr = 0;
-long last_update = 0;
-boolean switch_a = false;
-boolean switch_b = false;
-boolean hold_a = false;
-boolean debouncing_b = false;
-long last_button_L_press = 0;
-long last_button_R_press = 0;
-long last_print_date = 0;
 
 void setup() {
   Wire.begin();
@@ -73,96 +66,18 @@ void loop() {
   updateOffButton();
 
   if(CURRENT_STATE == AMBIENT_STATE) {
-    //ambient_display();
-
-   //if( onButtonPressed() )
     
+    ambientState();
+
   } else if(CURRENT_STATE == MESSAGE_STATE) {
 
     
-
-    
   }
-  
 
-  if(current_time-last_print_date >= 1000) {
-    printDate();
-    last_print_date = current_time;
-  }
-  
-
-  delay(100);
-
-
-  
-
-
-  /*  
-  //printDate();
   //servoTest();
-
-  if(current_time-last_switch >= 3000) {
-    mode++;
-    if(mode > 3) mode = 0;
-    
-    lcd.clear();
-    lcd.home();
-    
-    if(mode == 0) {
-      offPeak();
-    } else if(mode == 1) {
-      midPeak();
-    } else if(mode == 2) {
-      onPeak();
-    } else if(mode == 3) {
-      gridMalfunction();
-    }
-
-    last_switch = current_time;
-
-  }
-
-  switch(mode) {
-    case 0:
-      lcd.setPWM(REG_RED, 0);
-      lcd.setPWM(REG_GREEN, breath);
-      lcd.setPWM(REG_BLUE, 0);
-    break;
-    case 1:
-      lcd.setPWM(REG_RED, breath);
-      lcd.setPWM(REG_GREEN, breath);
-      lcd.setPWM(REG_BLUE, 0);
-    break;
-    case 2:
-      lcd.setPWM(REG_RED, breath);
-      lcd.setPWM(REG_GREEN, 0);
-      lcd.setPWM(REG_BLUE, 0);
-    break;
-    case 3:
-      lcd.setPWM(REG_RED, 255);
-      lcd.setPWM(REG_GREEN, 0);
-      lcd.setPWM(REG_BLUE, 0);
-    break;
-  }
-
-  if(current_time-last_incr >= 100) {
-    if(breath_dir) {
-      breath += 40;
-      if(breath > 255) { breath_dir = !breath_dir; breath = 255; }
-    } else {
-      breath -= 40;
-      if(breath < 0) { breath_dir = !breath_dir; breath = 0; }
-    }
-    last_incr = current_time;
-  }
-  */
  
   //Serial.print("~");
   //delay(100);
-
-
- 
-  
 
 }
 
@@ -231,12 +146,17 @@ void statusDisplay() {
 }
 
 
-void ambient_state() {
+void ambientState() {
 
   if(current_time-last_update >= 1000) {
     readDHT22();
     statusDisplay();
     last_update = current_time;
+  }
+
+  if(current_time-last_print_date >= 1000) {
+    printDate();
+    last_print_date = current_time;
   }
   
 }
