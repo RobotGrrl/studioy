@@ -12,14 +12,30 @@ Servo myservo;
 dht DHT;
 
 // pins
-const int button_L = 8;
-const int button_R = 9;
+const int button_L = 8; // green aka on
+const int button_R = 9; // pink aka off
 const int led_L = 11;
 const int led_R = 7;
 const int servo_pin = 10;
 const int spkr = 6;
 // lcd on i2c
 
+// states
+const int AMBIENT_STATE = 0;
+const int MESSAGE_STATE = 1;
+int CURRENT_STATE = AMBIENT_STATE;
+
+int button_L_prev = 0;
+int button_L_current = 0;
+long button_L_down = 0;
+long button_L_up = 0;
+
+int button_R_prev = 0;
+int button_R_current = 0;
+long button_R_down = 0;
+long button_R_up = 0;
+
+// vars
 int mode = 0;
 long last_switch = 0;
 long current_time = 0;
@@ -30,16 +46,19 @@ long last_update = 0;
 boolean switch_a = false;
 boolean switch_b = false;
 boolean hold_a = false;
-boolean hold_b = false;
+boolean debouncing_b = false;
 long last_button_L_press = 0;
 long last_button_R_press = 0;
+long last_print_date = 0;
 
 void setup() {
   Wire.begin();
   Serial.begin(9600);
   Serial.print("hello");
   lcd.begin(16,2);
-  myservo.attach(servo_pin);
+  
+  //myservo.attach(servo_pin);
+  
   pinMode(button_L, INPUT);
   pinMode(button_R, INPUT);
   pinMode(led_L, INPUT);
@@ -50,47 +69,32 @@ void setup() {
 void loop() {
 
   current_time = millis();
+  updateOnButton();
+  updateOffButton();
 
-  if(current_time-last_update >= 1000) {
-    readDHT22();
-    statusDisplay();
-    last_update = current_time;
-  }
+  if(CURRENT_STATE == AMBIENT_STATE) {
+    //ambient_display();
 
-  if(digitalRead(button_L) == HIGH) {
+   //if( onButtonPressed() )
     
-    if(hold_a) {
-      
-    } else {
-      hold_a = true;
-      last_button_L_press = current_time;
-    }
-    
-  }
-  if(digitalRead(button_R) == HIGH) {
-    last_button_R_press = current_time;
-    hold_b = true;
-  }
+  } else if(CURRENT_STATE == MESSAGE_STATE) {
 
-  if(current_time-last_button_L_press > 20 && hold_a == true) {
-    if(switch_a) {
-      digitalWrite(led_L, HIGH);  
-    } else {
-      digitalWrite(led_L, LOW);
-    }
-    switch_a = !switch_a;
-    hold_a = false;
+    
+
+    
   }
   
-  if(current_time-last_button_R_press > 20 && hold_b == true) {
-    if(switch_b) {
-      digitalWrite(led_R, HIGH);  
-    } else {
-      digitalWrite(led_R, LOW);
-    }
-    switch_b = !switch_b;
-    hold_b = false;
+
+  if(current_time-last_print_date >= 1000) {
+    printDate();
+    last_print_date = current_time;
   }
+  
+
+  delay(100);
+
+
+  
 
 
   /*  
@@ -155,6 +159,9 @@ void loop() {
  
   //Serial.print("~");
   //delay(100);
+
+
+ 
   
 
 }
@@ -220,6 +227,17 @@ void statusDisplay() {
   lcd.print(s1);
   lcd.setCursor(0, 1);
   lcd.print(s2);
+  
+}
+
+
+void ambient_state() {
+
+  if(current_time-last_update >= 1000) {
+    readDHT22();
+    statusDisplay();
+    last_update = current_time;
+  }
   
 }
 
