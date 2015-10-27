@@ -23,7 +23,8 @@ const int spkr = 6;
 // states
 const int AMBIENT_STATE = 0;
 const int MESSAGE_STATE = 1;
-int CURRENT_STATE = AMBIENT_STATE;
+const int MESSAGES_TEST = 2;
+int CURRENT_STATE = MESSAGES_TEST;
 
 // vars
 int mode = 0;
@@ -42,6 +43,9 @@ int button_R_prev = 0;
 int button_R_current = 0;
 long button_R_down = 0;
 long button_R_up = 0;
+
+long last_message_update = 0;
+int message_ind = 0;
 
 
 void setup() {
@@ -72,10 +76,84 @@ void loop() {
   } else if(CURRENT_STATE == MESSAGE_STATE) {
 
     
+  } else if(CURRENT_STATE == MESSAGES_TEST) {
+
+    if(current_time-last_message_update >= 4000 || last_message_update == 0) {
+      message_ind++;
+      last_message_update = current_time;
+
+      Serial.print("message index = ");
+      Serial.println(message_ind);
+
+      if(message_ind > 99) {
+        message_ind = 0;
+      }
+  
+      if(message_ind > 6) {
+        message_ind = 99;
+      } 
+        
+      lcd.clear();
+      lcd.home();
+  
+      // "0000000000000000"
+
+      switch(message_ind) {
+        case 0:
+          lcd.print("Grid status:");
+          lcd.setCursor(0, 1);
+          lcd.print("PEAK CAPACITY");
+        break;
+        case 1:
+          lcd.print("Turning on this");
+          lcd.setCursor(0, 1);
+          lcd.print("light for 30 min");
+        break;
+        case 2:
+          lcd.print("will add 72 kJ");
+          lcd.setCursor(0, 1);
+          lcd.print("to the grid.");
+        break;
+        case 3:
+          lcd.print("15m: Hold ON to");
+          lcd.setCursor(0, 1);
+          lcd.print("confirm.");
+          lcd.setCursor(11, 1);
+          lcd.print("5");
+          lcd.setCursor(12, 1);
+          lcd.print("s");
+        break;
+        case 4:
+          lcd.print("30m: Hold ON to");
+          lcd.setCursor(0, 1);
+          lcd.print("confirm.");
+          lcd.setCursor(11, 1);
+          lcd.print("5");
+          lcd.setCursor(12, 1);
+          lcd.print("s");
+        break;
+        case 5:
+          lcd.print("OK, Lumenbot");
+          lcd.setCursor(0, 1);
+          lcd.print("will activate!");
+        break;
+        case 6:
+          lcd.print("Make good use of");
+          lcd.setCursor(0, 1);
+          lcd.print("the electricity!");
+        break;
+        case 99:
+          lcd.print("Lumenbot won't");
+          lcd.setCursor(0, 1);
+          lcd.print("activate Zzz...");
+        break;
+      }
+
+    }
+    
   }
 
   //servoTest();
- 
   //Serial.print("~");
   //delay(100);
 
