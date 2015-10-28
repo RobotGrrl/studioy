@@ -39,6 +39,7 @@ float temp_incr = 0.5;
 float min_temp = 15.0;
 float max_temp = 25.0;
 float current_temp_F = 0;
+boolean button_hold = false;
 
 void setup() {
   Wire.begin();
@@ -61,33 +62,75 @@ void loop() {
   updateOnButton();
   updateOffButton();
 
+  if(digitalRead(button_L) == HIGH && digitalRead(button_R) == HIGH) {
+
+    button_hold = true;
+
+    readDHT22();
+
+    double meep = DHT.temperature;
+    double meep_F = meep * 9 / 5;
+    meep_F += 32;
+
+    Serial.println(meep);
+
+    digitalWrite(led_L, HIGH);
+    digitalWrite(led_R, HIGH);
+    
+    lcd.setCursor(0, 0);
+    lcd.print("Current temp:");
+    lcd.setCursor(0, 1);
+    lcd.print(meep);
+    lcd.setCursor(4, 1);
+    lcd.print("C  ");
+    lcd.setCursor(8, 1);
+    lcd.print(meep_F);
+    lcd.setCursor(12, 1);
+    lcd.print("F  ");
+  } else {
+
+    if(button_hold) {
+      button_hold = false;
+      current_temp = default_temp;
+      updateDisplay();
+      digitalWrite(led_L, LOW);
+      digitalWrite(led_R, LOW);
+      last_change_time = current_time;  
+    }
+    
+  }
+  
+
   if(current_time-last_change_time >= long(10000)) { // reset after 10s
     current_temp = default_temp;
     last_change_time = current_time;
   }
 
-  if(current_temp <= 18.0) {
-    lcd.setPWM(REG_RED, 10);
-    lcd.setPWM(REG_GREEN, 10);
-    lcd.setPWM(REG_BLUE, 255);
-  }
 
-  if(current_temp > 18.0 && current_temp <= 21.0) {
-    lcd.setPWM(REG_RED, 10);
-    lcd.setPWM(REG_GREEN, 255);
-    lcd.setPWM(REG_BLUE, 10);
-  }
+  if(!button_hold) {
 
-  if(current_temp > 21.0 && current_temp <= 23.0) {
-    lcd.setPWM(REG_RED, 200);
-    lcd.setPWM(REG_GREEN, 200);
-    lcd.setPWM(REG_BLUE, 10);
-  }
+    if(current_temp > min_temp && current_temp <= 18.0) {
+      lcd.setPWM(REG_RED, 10);
+      lcd.setPWM(REG_GREEN, 10);
+      lcd.setPWM(REG_BLUE, 255);
+    } else if(current_temp > 18.0 && current_temp <= 21.0) {
+      lcd.setPWM(REG_RED, 10);
+      lcd.setPWM(REG_GREEN, 255);
+      lcd.setPWM(REG_BLUE, 10);
+    } else if(current_temp > 21.0 && current_temp <= 23.0) {
+      lcd.setPWM(REG_RED, 200);
+      lcd.setPWM(REG_GREEN, 200);
+      lcd.setPWM(REG_BLUE, 10);
+    } else if(current_temp > 23.0 && current_temp <= max_temp) {
+      lcd.setPWM(REG_RED, 255);
+      lcd.setPWM(REG_GREEN, 10);
+      lcd.setPWM(REG_BLUE, 10);
+    }
 
-  if(current_temp > 23.0) {
-    lcd.setPWM(REG_RED, 255);
-    lcd.setPWM(REG_GREEN, 10);
-    lcd.setPWM(REG_BLUE, 10);
+  } else {
+    lcd.setPWM(REG_RED, 150);
+    lcd.setPWM(REG_GREEN, 50);
+    lcd.setPWM(REG_BLUE, 150);
   }
 
   //Serial.print("~");
