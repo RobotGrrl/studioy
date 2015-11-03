@@ -24,7 +24,7 @@ const int spkr = 6;
 const int AMBIENT_STATE = 0;
 const int MESSAGE_STATE = 1;
 const int MESSAGES_TEST = 2;
-int CURRENT_STATE = MESSAGES_TEST;
+int CURRENT_STATE = AMBIENT_STATE;
 
 // vars
 int mode = 0;
