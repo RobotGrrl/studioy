@@ -1,4 +1,5 @@
 #include <Wire.h>
+#include <Servo.h>
 #include "rgb_lcd.h"
 #include <dht.h>
 
@@ -7,6 +8,7 @@
 byte zero = 0x00; //workaround for issue #527
 
 rgb_lcd lcd;
+Servo myservo;
 dht DHT;
 
 // pins
@@ -40,12 +42,17 @@ float min_temp = 15.0;
 float max_temp = 25.0;
 float current_temp_F = 0;
 boolean button_hold = false;
+long button_hold_start_time = 0;
+
+boolean MONITOR_STATE = false;
 
 void setup() {
   Wire.begin();
   Serial.begin(9600);
   Serial.print("hello");
   lcd.begin(16,2);
+
+  //myservo.attach(servo_pin);
 
   pinMode(button_L, INPUT);
   pinMode(button_R, INPUT);
@@ -62,8 +69,9 @@ void loop() {
   updateOnButton();
   updateOffButton();
 
-  if(digitalRead(button_L) == HIGH && digitalRead(button_R) == HIGH) {
+  if( ( digitalRead(button_L) == HIGH && digitalRead(button_R) == HIGH ) || MONITOR_STATE == true) {
 
+    if(!button_hold) button_hold_start_time = current_time;
     button_hold = true;
 
     readDHT22();
@@ -73,9 +81,32 @@ void loop() {
     meep_F += 32;
 
     Serial.println(meep);
+  
+    if(!MONITOR_STATE) {
+      digitalWrite(led_L, HIGH);
+      digitalWrite(led_R, HIGH);
+    }
 
-    digitalWrite(led_L, HIGH);
-    digitalWrite(led_R, HIGH);
+    if(current_time-button_hold_start_time >= 3000) {
+      myservo.attach(servo_pin);
+      myservo.write(120);
+      delay(1000);
+      myservo.write(60);
+      delay(1000);
+      /*
+      for(int i=80; i<=100; i++) {
+        myservo.write(i);
+        delay(10);
+      }
+      delay(1000);
+      for(int i=100; i>80; i--) {
+        myservo.write(i);
+        delay(10);
+      }
+      delay(1000);
+      */
+      myservo.detach();
+    }
     
     lcd.setCursor(0, 0);
     lcd.print("Current temp:");
