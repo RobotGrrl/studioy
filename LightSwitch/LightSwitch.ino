@@ -47,6 +47,8 @@ long button_R_up = 0;
 long last_message_update = 0;
 int message_ind = 0;
 
+long button_hold_start_time = 0;
+boolean button_hold = false;
 
 
 void setup() {
@@ -69,6 +71,48 @@ void loop() {
   current_time = millis();
   updateOnButton();
   updateOffButton();
+
+  int strike_up = 120;
+  int strike_down = 60;
+
+
+  // checking for both buttons held down
+  if(digitalRead(button_L) == HIGH && digitalRead(button_R) == HIGH) {
+
+    if(!button_hold) button_hold_start_time = current_time;
+    button_hold = true;
+
+    if(current_time-button_hold_start_time >= 3000) {
+      myservo.attach(servo_pin);
+      myservo.write(strike_up);
+      delay(1000);
+      myservo.write(strike_down);
+      delay(1000);
+      myservo.detach();
+    }
+    
+  }
+
+
+  if(Serial.available() > 0) {
+    char c = Serial.read();
+
+    if(c == 'a') {
+      myservo.attach(servo_pin);
+      myservo.write(strike_up);
+      delay(500);
+      myservo.detach();
+    } else if(c == 'b') {
+      myservo.attach(servo_pin);
+      myservo.write(strike_down);
+      delay(500);
+      myservo.detach();
+    }
+    
+  }
+
+
+
 
   if(CURRENT_STATE == AMBIENT_STATE) {
     
@@ -235,9 +279,101 @@ void ambientState() {
 
   if(current_time-last_print_date >= 1000) {
     printDate();
+    timeOfUsage();
     last_print_date = current_time;
   }
   
 }
+
+
+
+void timeOfUsage() {
+
+
+  // Reset the register pointer
+  Wire.beginTransmission(DS1307_ADDRESS);
+  Wire.write(zero);
+  Wire.endTransmission();
+
+  Wire.requestFrom(DS1307_ADDRESS, 7);
+
+  int second = bcdToDec(Wire.read());
+  int minute = bcdToDec(Wire.read());
+  int hour = bcdToDec(Wire.read() & 0b111111); //24 hour time
+  int weekDay = bcdToDec(Wire.read()); //0-6 -> sunday - Saturday
+  int monthDay = bcdToDec(Wire.read());
+  int month = bcdToDec(Wire.read());
+  int year = bcdToDec(Wire.read());
+
+
+
+  float off_peak_cost = 0.083;
+  float mid_peak_cost = 0.128;
+  float on_peak_cost = 0.175;
+  
+  float result_cost = 0.0;
+
+  int hour_offset = -1; // dst
+
+  if(month >= 11 || month < 5) {
+    // winter
+
+    if(weekDay == 0 || weekDay == 6) {
+      // weekend
+      // off peak
+      result_cost = off_peak_cost;
+    } else {
+      // weekday
+      
+      if(hour >= (7+hour_offset) && hour < (11+hour_offset)) {
+        // on peak
+        result_cost = on_peak_cost;
+      } else if(hour >= (11+hour_offset) && hour < (17+hour_offset)) {
+        // mid peak
+        result_cost = mid_peak_cost;
+      } else if(hour >= (17+hour_offset) && hour < (19+hour_offset)) {
+        // on peak
+        result_cost = on_peak_cost;
+      } else {
+        // off peak
+        result_cost = off_peak_cost;
+      }
+      
+    }
+    
+  } else if(month >= 5 || month < 11) {
+    // summer
+
+    if(weekDay == 0 || weekDay == 6) {
+      // weekend
+      // off peak
+      result_cost = off_peak_cost;
+    } else {
+      // weekday
+
+      if(hour >= (7+hour_offset) && hour < (11+hour_offset)) {
+        // mid peak
+        result_cost = mid_peak_cost;
+      } else if(hour >= (11+hour_offset) && hour < (17+hour_offset)) {
+        // on peak
+        result_cost = on_peak_cost;
+      } else if(hour >= (17+hour_offset) && hour < (19+hour_offset)) {
+        // mid peak
+        result_cost = mid_peak_cost;
+      } else {
+        // off peak
+        result_cost = off_peak_cost;
+      }
+      
+    }
+    
+  }
+
+  Serial.print("Time of usage cost $");
+  Serial.print(result_cost);
+  Serial.print("\n");
+  
+}
+
 
 
