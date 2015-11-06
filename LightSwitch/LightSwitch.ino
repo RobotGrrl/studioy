@@ -51,6 +51,14 @@ long button_hold_start_time = 0;
 boolean button_hold = false;
 
 
+//const int strike_up = 120;
+//const int strike_down = 60;
+
+const int strike_up = 60;
+const int strike_down = 120;
+
+
+
 void setup() {
   Wire.begin();
   Serial.begin(9600);
@@ -71,10 +79,6 @@ void loop() {
   current_time = millis();
   updateOnButton();
   updateOffButton();
-
-  int strike_up = 120;
-  int strike_down = 60;
-
 
   // checking for both buttons held down
   if(digitalRead(button_L) == HIGH && digitalRead(button_R) == HIGH) {

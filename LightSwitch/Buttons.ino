@@ -8,13 +8,14 @@ void updateOnButton() {
   if(button_L_prev == LOW && button_L_current == HIGH && current_time-button_L_up > 20) {
     button_L_down = current_time;
     button_L_state = 1;
-    onButtonPressed();
     Serial.println("ON!");
+    onButtonPressed();
   }
 
   if(button_L_prev == HIGH && button_L_current == LOW && current_time-button_L_down > 20) {
     button_L_state = 0;
     Serial.println("ON! released");
+    onButtonReleased();
   }
 
   // wait 100ms before saying that the button is being held down
@@ -36,13 +37,14 @@ void updateOffButton() {
   if(button_R_prev == LOW && button_R_current == HIGH && current_time-button_R_down > 20) {
     button_R_down = current_time;
     button_R_state = 1;
-    offButtonPressed();
     Serial.print("OFF!");
+    offButtonPressed();
   }
 
   if(button_R_prev == HIGH && button_R_current == LOW && current_time-button_R_down > 20) {
     button_R_state = 0;
     Serial.println("OFF! released");
+    offButtonReleased();    
   }
 
   // wait 100ms before saying that the button is being held down
@@ -57,6 +59,8 @@ void updateOffButton() {
 
 void onButtonPressed() {
 
+  digitalWrite(led_L, HIGH);
+
   if(CURRENT_STATE == AMBIENT_STATE) {
     // change to message state
   }
@@ -65,12 +69,32 @@ void onButtonPressed() {
 
 void offButtonPressed() {
 
+  digitalWrite(led_R, HIGH);
+
   if(CURRENT_STATE == AMBIENT_STATE) {
     // brighten the lcd screen for 5 secs
   }
   
 }
 
+
+void onButtonReleased() {
+  myservo.attach(servo_pin);
+      myservo.write(strike_up);
+      delay(500);
+      myservo.detach();
+    digitalWrite(led_L, LOW);
+}
+
+
+void offButtonReleased() {
+  
+  myservo.attach(servo_pin);
+      myservo.write(strike_down);
+      delay(500);
+      myservo.detach();
+      digitalWrite(led_R, LOW);
+}
 
 
 
