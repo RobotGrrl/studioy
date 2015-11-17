@@ -152,17 +152,24 @@ void loop() {
         String s2;
 
         int bulb_watts = 60;
-        int joules = bulb_watts * elapsed_on_time;
+        float joules = bulb_watts * elapsed_on_time;
         float kilojoules = joules/1000;
-    
-        if(elapsed_on_time >= (60*30)) {
-          s2 = (String)elapsed_on_time + "s " + printFloat(kilojoules, 2) + "kJ OMG";
-        } else if(elapsed_on_time >= (60*5)) {
-          s2 = (String)elapsed_on_time + "s " + printFloat(kilojoules, 2) + "kJ BZZZT";
-        } else {
-          s2 = (String)elapsed_on_time + "s " + printFloat(kilojoules, 2) + "kJ";
+
+        String the_kj = (String)kilojoules;
+        for(int i=0; i<the_kj.length(); i++) {
+          if( the_kj[i] == '.' ) {
+             the_kj.remove(i+3); // remove everything except the last two digits 
+          }
         }
     
+        if(elapsed_on_time >= (60*30)) {
+          s2 = (String)elapsed_on_time + "s = " + the_kj + "kJ OMG";
+        } else if(elapsed_on_time >= (60*5)) {
+          s2 = (String)elapsed_on_time + "s = " + the_kj + "kJ BZZZT";
+        } else {
+          s2 = (String)elapsed_on_time + "s = " + the_kj + "kJ";
+        }
+        
         lcd.setCursor(0, 0);
         lcd.print(s1);
         lcd.setCursor(0, 1);
