@@ -148,12 +148,23 @@ void loop() {
           elapsed_on_time = abs( current_time_seconds - light_on_seconds );
         }
     
-        String s1 = "Light on for: ";
+        String s1 = "Light on: ";
+        String s_meep = (String)elapsed_on_time + "s";
         String s2;
 
         int bulb_watts = 60;
-        float joules = bulb_watts * elapsed_on_time;
-        float kilojoules = joules/1000;
+        //float joules = bulb_watts * elapsed_on_time;
+        float kilojoules =  ((float)bulb_watts * (float)elapsed_on_time) / 1000.0;
+
+        // $0.25 / kWh
+        // convert s -> h ....... s/60/60
+        // convert w -> kW ....... w/1000
+
+        // off peak cost
+        //float cost = 0.083 * ( (float)elapsed_on_time/60/60 ) * ( (float)bulb_watts/1000 );
+
+        // apocalypse cost
+        float cost = 5.0 * ( (float)elapsed_on_time/60/60 ) * ( (float)bulb_watts/1000 );
 
         String the_kj = (String)kilojoules;
         for(int i=0; i<the_kj.length(); i++) {
@@ -161,17 +172,16 @@ void loop() {
              the_kj.remove(i+3); // remove everything except the last two digits 
           }
         }
-    
-        if(elapsed_on_time >= (60*30)) {
-          s2 = (String)elapsed_on_time + "s = " + the_kj + "kJ OMG";
-        } else if(elapsed_on_time >= (60*5)) {
-          s2 = (String)elapsed_on_time + "s = " + the_kj + "kJ BZZZT";
-        } else {
-          s2 = (String)elapsed_on_time + "s = " + the_kj + "kJ";
-        }
+  
+        s2 = the_kj + "kJ $" + cost;
+
         
         lcd.setCursor(0, 0);
         lcd.print(s1);
+
+        lcd.setCursor(10, 0);
+        lcd.print(s_meep);
+        
         lcd.setCursor(0, 1);
         lcd.print(s2);
     
