@@ -150,13 +150,17 @@ void loop() {
     
         String s1 = "Light on for: ";
         String s2;
+
+        int bulb_watts = 60;
+        int joules = bulb_watts * elapsed_on_time;
+        float kilojoules = joules/1000;
     
         if(elapsed_on_time >= (60*30)) {
-          s2 = (String)elapsed_on_time + "s OMG";
+          s2 = (String)elapsed_on_time + "s " + printFloat(kilojoules, 2) + "kJ OMG";
         } else if(elapsed_on_time >= (60*5)) {
-          s2 = (String)elapsed_on_time + "s BZZZT";
+          s2 = (String)elapsed_on_time + "s " + printFloat(kilojoules, 2) + "kJ BZZZT";
         } else {
-          s2 = (String)elapsed_on_time + "s";
+          s2 = (String)elapsed_on_time + "s " + printFloat(kilojoules, 2) + "kJ";
         }
     
         lcd.setCursor(0, 0);
