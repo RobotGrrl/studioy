@@ -24,7 +24,9 @@ const int spkr = 6;
 const int AMBIENT_STATE = 0;
 const int MESSAGE_STATE = 1;
 const int MESSAGES_TEST = 2;
-int CURRENT_STATE = AMBIENT_STATE;
+const int CYCLE_MODE = 3;
+const int LIVE_MODE = 4;
+int CURRENT_STATE = LIVE_MODE;
 
 // vars
 int mode = 0;
@@ -57,6 +59,24 @@ boolean button_hold = false;
 const int strike_up = 60;
 const int strike_down = 120;
 
+
+long last_tou_change = 0;
+int tou_state = 0; // 0 = off peak, 1 = mid peak, 2 = high peak
+int cur_msg = 0;
+long last_msg_flip = 0;
+
+long last_update_live_mode = 0;
+
+boolean button_lock = false;
+boolean msg_displayed = false;
+boolean light_on = false;
+
+int light_on_seconds = 0;
+int light_on_time = 0;
+int light_off_time = 0;
+int total_light_on_time = 0;
+int current_time_seconds = 0;
+int elapsed_on_time = 0;
 
 
 void setup() {
@@ -98,6 +118,318 @@ void loop() {
   }
 
 
+
+
+
+
+
+ if(CURRENT_STATE == LIVE_MODE) {
+
+    if(current_time-last_update_live_mode >= 1000) {
+
+        // read the RTC
+        Wire.beginTransmission(DS1307_ADDRESS);
+        Wire.write(zero);
+        Wire.endTransmission();
+      
+        Wire.requestFrom(DS1307_ADDRESS, 7);
+      
+        int second = bcdToDec(Wire.read());
+        int minute = bcdToDec(Wire.read());
+        int hour = bcdToDec(Wire.read() & 0b111111); //24 hour time
+        int weekDay = bcdToDec(Wire.read()); //0-6 -> sunday - Saturday
+        int monthDay = bcdToDec(Wire.read());
+        int month = bcdToDec(Wire.read());
+        int year = bcdToDec(Wire.read());
+      
+        current_time_seconds = second + (60*minute) + (60*60*hour);
+
+        if(light_on) {
+          elapsed_on_time = abs( current_time_seconds - light_on_seconds );
+        }
+    
+        String s1 = "Light on for: ";
+        String s2;
+    
+        if(elapsed_on_time >= (60*30)) {
+          s2 = (String)elapsed_on_time + "s OMG";
+        } else if(elapsed_on_time >= (60*5)) {
+          s2 = (String)elapsed_on_time + "s BZZZT";
+        } else {
+          s2 = (String)elapsed_on_time + "s";
+        }
+    
+        lcd.setCursor(0, 0);
+        lcd.print(s1);
+        lcd.setCursor(0, 1);
+        lcd.print(s2);
+    
+        last_update_live_mode = current_time;
+
+    }
+
+}
+
+
+
+
+
+
+
+
+  
+
+if(CURRENT_STATE == CYCLE_MODE) {
+    
+if(button_lock == false) {
+
+  if(current_time-last_tou_change >= long(30*1000) || last_tou_change == 0) {
+    tou_state++;
+    if(tou_state > 2) tou_state = 0;
+    last_tou_change = current_time;
+  }
+
+
+  if(current_time-last_msg_flip >= long(5*1000) || last_msg_flip == 0) {
+    
+     cur_msg++;
+     if(cur_msg > 4) cur_msg = 0;
+     last_msg_flip = current_time;
+
+     if(cur_msg == 0) {
+
+        lcd.clear();
+        lcd.home();
+
+        if(light_on) {
+
+          // read the RTC
+          Wire.beginTransmission(DS1307_ADDRESS);
+          Wire.write(zero);
+          Wire.endTransmission();
+        
+          Wire.requestFrom(DS1307_ADDRESS, 7);
+        
+          int second = bcdToDec(Wire.read());
+          int minute = bcdToDec(Wire.read());
+          int hour = bcdToDec(Wire.read() & 0b111111); //24 hour time
+          int weekDay = bcdToDec(Wire.read()); //0-6 -> sunday - Saturday
+          int monthDay = bcdToDec(Wire.read());
+          int month = bcdToDec(Wire.read());
+          int year = bcdToDec(Wire.read());
+        
+          current_time_seconds = second + (60*minute) + (60*60*hour);
+
+          elapsed_on_time = abs( current_time_seconds - light_on_seconds );
+
+          String s1 = "Light on for: ";
+          String s2;
+
+          if(elapsed_on_time >= (60*30)) {
+            s2 = " " + (String)elapsed_on_time + " seconds OMG";
+          } else if(elapsed_on_time >= (60*5)) {
+            s2 = " " + (String)elapsed_on_time + " seconds BZZZT";
+          } else {
+            s2 = " " + (String)elapsed_on_time + " seconds";
+          }
+
+          Serial.println(s2);
+
+          lcd.print(s1);
+          lcd.setCursor(0, 1);
+          lcd.print(s2);
+          
+        } else {
+          readDHT22();
+          String s1 = "Temp: " + (String)DHT.temperature + " C";
+          String s2 = "Humidity: " + (String)DHT.humidity + "%";
+        
+          lcd.print(s1);
+          lcd.setCursor(0, 1);
+          lcd.print(s2);
+        }
+
+  
+        if(tou_state == 0) {
+    
+          lcd.setPWM(REG_RED, 10);
+          lcd.setPWM(REG_GREEN, 255);
+          lcd.setPWM(REG_BLUE, 10);
+          
+          
+        } else if(tou_state == 1) {
+    
+          lcd.setPWM(REG_RED, 200);
+          lcd.setPWM(REG_GREEN, 200);
+          lcd.setPWM(REG_BLUE, 10);
+    
+    
+          
+        } else if(tou_state == 2) {
+    
+          lcd.setPWM(REG_RED, 255);
+          lcd.setPWM(REG_GREEN, 10);
+          lcd.setPWM(REG_BLUE, 10);
+     
+        }
+      
+     } else if(cur_msg == 1) {
+      
+       if(tou_state == 0) {
+  
+        lcd.setPWM(REG_RED, 10);
+        lcd.setPWM(REG_GREEN, 255);
+        lcd.setPWM(REG_BLUE, 10);
+        
+        lcd.clear();
+        lcd.home();
+  
+        lcd.print("Grid status:");
+        lcd.setCursor(0, 1);
+        lcd.print("Off peak");
+        
+      } else if(tou_state == 1) {
+  
+        lcd.setPWM(REG_RED, 200);
+        lcd.setPWM(REG_GREEN, 200);
+        lcd.setPWM(REG_BLUE, 10);
+  
+        lcd.clear();
+        lcd.home();
+  
+        lcd.print("Grid status:");
+        lcd.setCursor(0, 1);
+        lcd.print("Mid peak");
+  
+        
+      } else if(tou_state == 2) {
+  
+        lcd.setPWM(REG_RED, 255);
+        lcd.setPWM(REG_GREEN, 10);
+        lcd.setPWM(REG_BLUE, 10);
+  
+        lcd.clear();
+        lcd.home();
+  
+        lcd.print("Grid status:");
+        lcd.setCursor(0, 1);
+        lcd.print("On peak");
+   
+      }
+
+     } else if(cur_msg == 2) {
+
+
+        if(tou_state == 0) {
+
+          lcd.setPWM(REG_RED, 10);
+          lcd.setPWM(REG_GREEN, 255);
+          lcd.setPWM(REG_BLUE, 10);
+          
+          lcd.clear();
+          lcd.home();
+    
+          lcd.print("The grid has");
+          lcd.setCursor(0, 1);
+          lcd.print("capacity");
+          
+        } else if(tou_state == 1) {
+
+          lcd.setPWM(REG_RED, 200);
+          lcd.setPWM(REG_GREEN, 200);
+          lcd.setPWM(REG_BLUE, 10);
+        
+          lcd.clear();
+          lcd.home();
+    
+          lcd.print("The grid is");
+          lcd.setCursor(0, 1);
+          lcd.print("becoming full");
+          
+        } else if(tou_state == 2) {
+
+          lcd.setPWM(REG_RED, 255);
+          lcd.setPWM(REG_GREEN, 10);
+          lcd.setPWM(REG_BLUE, 10);
+          
+          lcd.clear();
+          lcd.home();
+    
+          lcd.print("The grid is at");
+          lcd.setCursor(0, 1);
+          lcd.print("PEAK CAPACITY");
+          
+        }
+
+      
+     } else if(cur_msg == 3) {
+
+
+        if(tou_state == 0) {
+
+          lcd.setPWM(REG_RED, 10);
+          lcd.setPWM(REG_GREEN, 255);
+          lcd.setPWM(REG_BLUE, 10);
+          
+          lcd.clear();
+          lcd.home();
+    
+          lcd.print("Electricity rate:");
+          lcd.setCursor(0, 1);
+          lcd.print("8.3 cents/kWh");
+          
+        } else if(tou_state == 1) {
+
+          lcd.setPWM(REG_RED, 200);
+          lcd.setPWM(REG_GREEN, 200);
+          lcd.setPWM(REG_BLUE, 10);
+        
+          lcd.clear();
+          lcd.home();
+    
+          lcd.print("Electricity rate:");
+          lcd.setCursor(0, 1);
+          lcd.print("12.8 cents/kWh");
+          
+        } else if(tou_state == 2) {
+
+          lcd.setPWM(REG_RED, 255);
+          lcd.setPWM(REG_GREEN, 10);
+          lcd.setPWM(REG_BLUE, 10);
+          
+          lcd.clear();
+          lcd.home();
+    
+          lcd.print("Electricity rate:");
+          lcd.setCursor(0, 1);
+          lcd.print("17.5 cents/kWh");
+          
+        }
+
+
+      
+     }
+
+
+
+
+  }
+
+
+
+    
+  }
+
+
+
+  }
+  
+
+
+
+
+
+
   if(Serial.available() > 0) {
     char c = Serial.read();
 
@@ -116,7 +448,7 @@ void loop() {
   }
 
 
-
+/*
 
   if(CURRENT_STATE == AMBIENT_STATE) {
     
@@ -201,6 +533,9 @@ void loop() {
     }
     
   }
+
+  */
+
   
   //servoTest();
   //Serial.print("~");
