@@ -41,4 +41,22 @@ void printDate() {
 
 }
 
+void readRTC() {
+  
+  // read the RTC
+  Wire.beginTransmission(DS1307_ADDRESS);
+  Wire.write(zero);
+  Wire.endTransmission();
+  
+  Wire.requestFrom(DS1307_ADDRESS, 7);
+  
+  thetime.second = bcdToDec(Wire.read());
+  thetime.minute = bcdToDec(Wire.read());
+  thetime.hour = bcdToDec(Wire.read() & 0b111111); //24 hour time
+  thetime.weekDay = bcdToDec(Wire.read()); //0-6 -> sunday - Saturday
+  thetime.monthDay = bcdToDec(Wire.read());
+  thetime.month = bcdToDec(Wire.read());
+  thetime.year = bcdToDec(Wire.read());
+  
+}
 
