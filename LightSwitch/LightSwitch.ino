@@ -15,6 +15,7 @@ dht DHT;
 // lcd is on i2c
 const int button_L = 8; // green aka on
 const int button_R = 9; // pink aka off
+const int button_D = 4; // detail button on the side
 const int led_L = 11;
 const int led_R = 7;
 const int servo_pin = 10;
@@ -103,6 +104,7 @@ void setup() {
   
   pinMode(button_L, INPUT);
   pinMode(button_R, INPUT);
+  pinMode(button_D, INPUT);
   pinMode(led_L, OUTPUT);
   pinMode(led_R, OUTPUT);
   pinMode(spkr, OUTPUT);
@@ -111,6 +113,13 @@ void setup() {
 void loop() {
 
   current_time = millis();
+
+
+  if(digitalRead(button_D) == HIGH) {
+    Serial.println("PRESSED!");
+  }
+
+
 
   // update the buttons
   updateOnButton();
