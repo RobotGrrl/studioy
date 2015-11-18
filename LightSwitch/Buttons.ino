@@ -234,10 +234,6 @@ void updateOffButton() {
       }
       
 
-
-  
-
-
   // wait 100ms before saying that the button is being held down
   if(button_R_prev == HIGH && button_R_current == HIGH && current_time-button_R_down > 20) {
     // holding
@@ -254,74 +250,34 @@ void onButtonPressed() {
 
   digitalWrite(led_L, HIGH);
 
-  if(CURRENT_STATE == AMBIENT_STATE) {
-    // change to message state
-  }
+  readRTC();
 
-  // read the RTC
-  
-  Wire.beginTransmission(DS1307_ADDRESS);
-  Wire.write(zero);
-  Wire.endTransmission();
-
-  Wire.requestFrom(DS1307_ADDRESS, 7);
-
-  int second = bcdToDec(Wire.read());
-  int minute = bcdToDec(Wire.read());
-  int hour = bcdToDec(Wire.read() & 0b111111); //24 hour time
-  int weekDay = bcdToDec(Wire.read()); //0-6 -> sunday - Saturday
-  int monthDay = bcdToDec(Wire.read());
-  int month = bcdToDec(Wire.read());
-  int year = bcdToDec(Wire.read());
-
-  light_on_time = minute + (60*hour);
+  light_on_time = thetime.minute + (60*thetime.hour);
 
   if(CURRENT_STATE == LIVE_MODE) {
-
-light_on_seconds = second + (60*minute) + (60*60*hour);
-  light_on = true;
-    
-    myservo.attach(servo_pin);
-              myservo.write(strike_up);
-              delay(500);
-              myservo.detach();
-            digitalWrite(led_L, LOW);
+    light_on_seconds = thetime.second + (60*thetime.minute) + (60*60*thetime.hour);
+    light_on = true;
+    servoTurnLightOn();
   }
-  
   
 }
 
 void offButtonPressed() {
-
   digitalWrite(led_R, HIGH);
-
-  if(CURRENT_STATE == AMBIENT_STATE) {
-    // brighten the lcd screen for 5 secs
-  }
-  
 }
-
 
 void onButtonReleased() {
-  /*
-  myservo.attach(servo_pin);
-      myservo.write(strike_up);
-      delay(500);
-      myservo.detach();
-      */
-    digitalWrite(led_L, LOW);
-    
+  digitalWrite(led_L, LOW);
 }
-
 
 void offButtonReleased() {
   
   myservo.attach(servo_pin);
-      myservo.write(strike_down);
-      delay(500);
-      myservo.detach();
-      
-      digitalWrite(led_R, LOW);
+  myservo.write(strike_down);
+  delay(500);
+  myservo.detach();
+  
+  digitalWrite(led_R, LOW);
 
   // read the RTC
   Wire.beginTransmission(DS1307_ADDRESS);
@@ -349,12 +305,8 @@ void offButtonReleased() {
   light_on  = false;
 
   if(CURRENT_STATE == LIVE_MODE) {
-    
-    myservo.attach(servo_pin);
-              myservo.write(strike_down);
-              delay(500);
-              myservo.detach();
-            digitalWrite(led_L, LOW);
+    servoTurnLightOff();
+    digitalWrite(led_L, LOW);
   }
 
   // TODO:

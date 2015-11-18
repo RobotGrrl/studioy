@@ -69,3 +69,43 @@ String printFloat(float value, int places) {
 }
 
 
+
+void servoTurnLightOff() {
+  myservo.attach(servo_pin);
+  myservo.write(strike_down);
+  delay(500);
+  myservo.detach();
+}
+
+
+void servoTurnLightOn() {
+  myservo.attach(servo_pin);
+  myservo.write(strike_up);
+  delay(500);
+  myservo.detach();
+}
+
+void lcdSetColour(int r, int g, int b) {
+  lcd.setPWM(REG_RED, r);
+  lcd.setPWM(REG_GREEN, g);
+  lcd.setPWM(REG_BLUE, b);
+}
+
+
+
+void servoTest() {
+ for(int i=0; i<180; i++) {
+    myservo.write(i);
+    delay(10);
+  }
+  delay(100);
+  for(int i=180; i>0; i--) {
+    myservo.write(i);
+    delay(10);
+  }
+  delay(100);
+}
+
+
+
+
