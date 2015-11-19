@@ -107,5 +107,16 @@ void servoTest() {
 }
 
 
+void playTone(int tone, int duration) {
 
+  if(MUTE) return;
+ 
+  for (long i = 0; i < duration * 1000L; i += tone * 2) {
+    digitalWrite(spkr, HIGH);
+    delayMicroseconds(tone);
+    digitalWrite(spkr, LOW);
+    delayMicroseconds(tone);
+  }
+  
+}
 

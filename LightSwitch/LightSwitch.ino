@@ -3,6 +3,7 @@
 #include "rgb_lcd.h"
 #include <dht.h>
 
+#define MUTE false
 #define DHT22_PIN 5
 #define DS1307_ADDRESS 0x68
 byte zero = 0x00; //workaround for issue #527
@@ -31,8 +32,9 @@ const int MESSAGE_STATE = 1;
 const int MESSAGES_TEST = 2;
 const int CYCLE_MODE = 3;
 const int LIVE_MODE = 4;
-const int CREDITS_MODE = 5;
-int CURRENT_STATE = CREDITS_MODE;
+const int AMBIENT_MODE = 5;
+const int CREDITS_MODE = 6;
+int CURRENT_STATE = LIVE_MODE;
 
 // vars
 int mode = 0;
@@ -40,6 +42,7 @@ long current_time = 0;
 long last_update = 0;
 long last_print_date = 0;
 
+// buttons
 int button_L_state = 0; // 0 = released, 1 = pressed, 2 = released
 int button_L_prev = 0;
 int button_L_current = 0;
@@ -52,15 +55,19 @@ int button_R_current = 0;
 long button_R_down = 0;
 long button_R_up = 0;
 
+int button_D_state = 0; // 0 = released, 1 = pressed, 2 = released
+int button_D_prev = 0;
+int button_D_current = 0;
+long button_D_down = 0;
+long button_D_up = 0;
+// ---
+
 long last_message_update = 0;
 int message_ind = 0;
 
 long button_hold_start_time = 0;
 boolean button_hold = false;
-
-
-//const int strike_up = 120;
-//const int strike_down = 60;
+int mode_press = 0;
 
 
 long last_tou_change = 0;
@@ -80,6 +87,7 @@ int light_off_time = 0;
 int total_light_on_time = 0;
 int current_time_seconds = 0;
 int elapsed_on_time = 0;
+int elapsed_on_mins = 0;
 
 struct RTC {
   int second;
@@ -108,37 +116,30 @@ void setup() {
   pinMode(led_L, OUTPUT);
   pinMode(led_R, OUTPUT);
   pinMode(spkr, OUTPUT);
+
+  // startup chirp
+  playTone(300, 100);
+  delay(100);
+  playTone(500, 100);
+  delay(100);
+  playTone(700, 80);
+  delay(80);
+  playTone(700, 80);
+  delay(80);
+  playTone(300, 80);
+  delay(80);
+  playTone(300, 80);
+  delay(80);
 }
 
 void loop() {
 
   current_time = millis();
 
-
-  if(digitalRead(button_D) == HIGH) {
-    Serial.println("PRESSED!");
-  }
-
-
-
   // update the buttons
   updateOnButton();
   updateOffButton();
-
-  // checking for both buttons held down - easter egg feature
-  if(digitalRead(button_L) == HIGH && digitalRead(button_R) == HIGH) {
-
-    if(!button_hold) button_hold_start_time = current_time;
-    button_hold = true;
-
-    if(current_time-button_hold_start_time >= 3000) {
-      servoTurnLightOn();
-      delay(100);
-      servoTurnLightOff();
-      delay(100);
-    }
-    
-  }
+  updateDButton();
 
 
   // live mode displays how long the light has been turned on
@@ -156,12 +157,31 @@ void loop() {
   
   }
 
+  if(CURRENT_STATE == AMBIENT_MODE) {
+    ambientMode();
+  }
+
 
   // display the credits scene
   if(CURRENT_STATE == CREDITS_MODE) {
     creditsMode();
   }
-  
+
+
+  // checking for both buttons held down - easter egg feature
+  if(digitalRead(button_L) == HIGH && digitalRead(button_R) == HIGH) {
+
+    if(!button_hold) button_hold_start_time = current_time;
+    button_hold = true;
+
+    if(current_time-button_hold_start_time >= 3000) {
+      servoTurnLightOn();
+      delay(100);
+      servoTurnLightOff();
+      delay(100);
+    }
+    
+  }
 
 
   // simulate the servo movements
@@ -176,6 +196,8 @@ void loop() {
       digitalWrite(led_R, HIGH);
       servoTurnLightOff();
       digitalWrite(led_R, LOW);
+    } else if(c == 'm') {
+      dButtonReleased();
     }
     
   }
@@ -281,39 +303,6 @@ void loop() {
 
 
 
-
-void statusDisplay() {
-
-  lcd.clear();
-  lcd.home();
-
-  lcdSetColour(200, 50, 150);
-
-  String s1 = "Temp: " + (String)DHT.temperature + " C";
-  String s2 = "Humidity: " + (String)DHT.humidity + "%";
-
-  lcd.print(s1);
-  lcd.setCursor(0, 1);
-  lcd.print(s2);
-  
-}
-
-
-void ambientState() {
-
-  if(current_time-last_update >= 1000) {
-    readDHT22();
-    statusDisplay();
-    last_update = current_time;
-  }
-
-  if(current_time-last_print_date >= 1000) {
-    printDate();
-    timeOfUsage();
-    last_print_date = current_time;
-  }
-  
-}
 
 
 

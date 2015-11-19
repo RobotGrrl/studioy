@@ -1,4 +1,35 @@
 
+void updateDButton() {
+
+  button_D_prev = button_D_current;
+  button_D_current = digitalRead(button_D);
+
+  // pressing / debouncing
+  if(button_D_prev == LOW && button_D_current == HIGH && current_time-button_D_up > 20) {
+    button_D_down = current_time;
+    button_D_state = 1;
+    Serial.println("DETAIL!");
+    dButtonPressed();
+  }
+
+  if(button_D_prev == HIGH && button_D_current == LOW && current_time-button_D_down > 20) {
+    button_D_state = 0;
+    Serial.println("DETAIL! released");
+    button_lock = false;
+    msg_displayed = false;
+    dButtonReleased();
+  }
+
+  // wait 100ms before saying that the button is being held down
+  if(button_D_prev == HIGH && button_D_current == HIGH && current_time-button_D_down > 20) {
+    // holding
+    long holding_D = current_time-button_D_down;
+    button_D_state = 2;
+    Serial.print("DETAIL! "); Serial.println(holding_D);
+  }
+
+}
+
 void updateOnButton() {
 
   button_L_prev = button_L_current;
@@ -322,4 +353,39 @@ void offButtonReleased() {
 
 
 
+void dButtonPressed() {
+  // nothing to do really
+}
+
+void dButtonReleased() {
+  // switch modes
+
+  playTone(400, 80);
+  delay(80);
+
+  mode_press++;
+  if(mode_press > 3) mode_press = 0;
+
+  if(mode_press == 0) {
+    last_update_live_mode = 0;
+    CURRENT_STATE = LIVE_MODE;
+  }
+
+  if(mode_press == 1) {
+    last_msg_flip = 0;
+    CURRENT_STATE = CYCLE_MODE;
+  }
+  
+  if(mode_press == 2) {
+    last_update = 0;
+    CURRENT_STATE = AMBIENT_MODE;
+  }
+  
+  if(mode_press == 3) {
+    cur_msg = 9; // just hacking how it advances quickly at the start
+    last_msg_flip = 0;
+    CURRENT_STATE = CREDITS_MODE;
+  }
+  
+}
 

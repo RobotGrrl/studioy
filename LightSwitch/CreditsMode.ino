@@ -1,6 +1,6 @@
 void creditsMode() {
 
-  if(current_time-last_msg_flip >= long(3*1000) || last_msg_flip == 0) {
+  if(current_time-last_msg_flip >= long(2*1000) || last_msg_flip == 0) {
 
     cur_msg++;
     if(cur_msg > 9) cur_msg = 0;
@@ -16,12 +16,19 @@ void creditsMode() {
 
     switch(cur_msg) {
       case 0:
+        servoTurnLightOn();
         s1 = "Lumenbot brought";
         s2 = "to life";
         lcd.setCursor(calcCenter(s1), 0);
         lcd.print(s1);
         lcd.setCursor(calcCenter(s2), 1);
         lcd.print(s2);
+        playTone(300, 80);
+        delay(80);
+        playTone(300, 80);
+        delay(80);
+        playTone(600, 100);
+        delay(100);
       break;
       case 1:
         s1 = "during learning";
@@ -30,6 +37,10 @@ void creditsMode() {
         lcd.print(s1);
         lcd.setCursor(calcCenter(s2), 1);
         lcd.print(s2);
+        playTone(300, 80);
+        delay(80);
+        playTone(300, 80);
+        delay(80);
       break;
       case 2:
         s1 = "Studio[Y] MaRS";
@@ -38,6 +49,12 @@ void creditsMode() {
         lcd.print(s1);
         lcd.setCursor(calcCenter(s2), 1);
         lcd.print(s2);
+        playTone(600, 80);
+        delay(80);
+        playTone(600, 80);
+        delay(80);
+        playTone(300, 80);
+        delay(80);
       break;
       case 3:
         s1 = "Shocking";
@@ -46,6 +63,12 @@ void creditsMode() {
         lcd.print(s1);
         lcd.setCursor(calcCenter(s2), 1);
         lcd.print(s2);
+        playTone(600, 100);
+        delay(100);
+        playTone(300, 80);
+        delay(80);
+        playTone(300, 80);
+        delay(80);
       break;
       case 4:
         s1 = "Rebecca";
@@ -54,6 +77,10 @@ void creditsMode() {
         lcd.print(s1);
         lcd.setCursor(calcCenter(s2), 1);
         lcd.print(s2);
+        playTone(600, 80);
+        delay(80);
+        playTone(600, 80);
+        delay(80);
       break;
       case 5:
         s1 = "David";
@@ -62,6 +89,12 @@ void creditsMode() {
         lcd.print(s1);
         lcd.setCursor(calcCenter(s2), 1);
         lcd.print(s2);
+        playTone(500, 100);
+        delay(100);
+        playTone(700, 80);
+        delay(80);
+        playTone(500, 100);
+        delay(100);
       break;
       case 6:
         s1 = "Fatin";
@@ -70,6 +103,12 @@ void creditsMode() {
         lcd.print(s1);
         lcd.setCursor(calcCenter(s2), 1);
         lcd.print(s2);
+        playTone(300, 80);
+        delay(80);
+        playTone(300, 80);
+        delay(80);
+        playTone(300, 80);
+        delay(80);
       break;
       case 7:
         s1 = "Erin RobotGrrl";
@@ -78,6 +117,12 @@ void creditsMode() {
         lcd.print(s1);
         lcd.setCursor(calcCenter(s2), 1);
         lcd.print(s2);
+        playTone(300, 80);
+        delay(80);
+        playTone(500, 80);
+        delay(80);
+        playTone(700, 80);
+        delay(80);
       break;
       case 8:
         s1 = "Lumenbot";
@@ -86,14 +131,23 @@ void creditsMode() {
         lcd.print(s1);
         lcd.setCursor(calcCenter(s2), 1);
         lcd.print(s2);
+        playTone(300, 100);
+        delay(80);
+        playTone(300, 100);
+        delay(80);
+        playTone(300, 100);
+        delay(80);
       break;
       case 9:
+        servoTurnLightOff();
         s1 = ";)";
         s2 = "";
         lcd.setCursor(calcCenter(s1), 0);
         lcd.print(s1);
         lcd.setCursor(calcCenter(s2), 1);
         lcd.print(s2);
+        playTone(700, 80);
+        delay(80);
       break;
     }
  
