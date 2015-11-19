@@ -282,13 +282,29 @@ void onButtonPressed() {
   digitalWrite(led_L, HIGH);
 
   readRTC();
-
   light_on_time = thetime.minute + (60*thetime.hour);
 
   if(CURRENT_STATE == LIVE_MODE) {
     light_on_seconds = thetime.second + (60*thetime.minute) + (60*60*thetime.hour);
     light_on = true;
     servoTurnLightOn();
+
+    // output some data
+    Serial.print("Light turned on: ");
+    
+    Serial.print(thetime.month);
+    Serial.print("/");
+    Serial.print(thetime.weekDay);
+    Serial.print("/");
+    Serial.print(thetime.year);
+    Serial.print(" ");
+    Serial.print(thetime.hour);
+    Serial.print(":");
+    Serial.print(thetime.minute);
+    Serial.print(":");
+    Serial.println(thetime.second);
+
+    
   }
   
 }
@@ -335,9 +351,40 @@ void offButtonReleased() {
 
   light_on  = false;
 
+
+
+  readRTC();
+  
+
   if(CURRENT_STATE == LIVE_MODE) {
     servoTurnLightOff();
     digitalWrite(led_L, LOW);
+
+    // output some data
+    Serial.print("Light turned off: ");
+    
+    Serial.print(thetime.month);
+    Serial.print("/");
+    Serial.print(thetime.weekDay);
+    Serial.print("/");
+    Serial.print(thetime.year);
+    Serial.print(" ");
+    Serial.print(thetime.hour);
+    Serial.print(":");
+    Serial.print(thetime.minute);
+    Serial.print(":");
+    Serial.println(thetime.second);
+
+    // for calculating the difference
+    stoptime.month = thetime.month;
+    stoptime.monthDay = thetime.monthDay;
+    stoptime.year = thetime.year;
+    stoptime.hour = thetime.hour;
+    stoptime.minute = thetime.minute;
+    stoptime.second = thetime.second;
+
+    displayTimeDuration();
+
   }
 
   // TODO:

@@ -16,12 +16,14 @@ if(current_time-last_update_live_mode < 1000) return;
     int bulb_watts = 600;
     float kilojoules =  ((float)bulb_watts * (float)elapsed_on_time) / 1000.0;
 
+    /*
     if(elapsed_on_time%(5) == 0) {
       playTone(700, 80);
       delay(80);
       playTone(300, 80);
       delay(80);
     }
+    */
     
     // $0.25 / kWh
     // convert s -> h ....... s/60/60

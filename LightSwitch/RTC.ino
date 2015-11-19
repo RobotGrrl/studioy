@@ -60,3 +60,28 @@ void readRTC() {
   
 }
 
+
+void displayTimeDuration() {
+
+  Serial.print("Elapsed duration: ");
+
+  elapsedtime.month = 
+
+  Serial.print(thetime.month);
+    Serial.print("/");
+    Serial.print(thetime.weekDay);
+    Serial.print("/");
+    Serial.print(thetime.year);
+    Serial.print(" ");
+    Serial.print(thetime.hour);
+    Serial.print(":");
+    Serial.print(thetime.minute);
+    Serial.print(":");
+    Serial.println(thetime.second);
+  
+}
+
+
+
+
+

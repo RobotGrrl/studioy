@@ -101,11 +101,15 @@ struct RTC {
 
 RTC thetime = { 0, 0, 0, 0, 0, 0, 0 };
 
+RTC starttime = { 0, 0, 0, 0, 0, 0, 0 };
+RTC endtime = { 0, 0, 0, 0, 0, 0, 0 };
+RTC elapsedtime = { 0, 0, 0, 0, 0, 0, 0 };
+
 
 void setup() {
   Wire.begin();
   Serial.begin(9600);
-  Serial.print("hello");
+  Serial.print("* * * Hello! I am Lumenbot! * * *");
   lcd.begin(16,2);
   
   //myservo.attach(servo_pin);
