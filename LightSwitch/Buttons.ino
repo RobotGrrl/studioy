@@ -304,7 +304,14 @@ void onButtonPressed() {
     Serial.print(":");
     Serial.println(thetime.second);
 
-    
+    // for calculating the difference
+    stoptime.month = thetime.month;
+    stoptime.monthDay = thetime.monthDay;
+    stoptime.year = thetime.year;
+    stoptime.hour = thetime.hour;
+    stoptime.minute = thetime.minute;
+    stoptime.second = thetime.second;
+
   }
   
 }

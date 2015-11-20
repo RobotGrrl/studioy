@@ -102,7 +102,7 @@ struct RTC {
 RTC thetime = { 0, 0, 0, 0, 0, 0, 0 };
 
 RTC starttime = { 0, 0, 0, 0, 0, 0, 0 };
-RTC endtime = { 0, 0, 0, 0, 0, 0, 0 };
+RTC stoptime = { 0, 0, 0, 0, 0, 0, 0 };
 RTC elapsedtime = { 0, 0, 0, 0, 0, 0, 0 };
 
 

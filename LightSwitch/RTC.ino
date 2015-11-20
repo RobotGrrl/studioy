@@ -63,21 +63,26 @@ void readRTC() {
 
 void displayTimeDuration() {
 
+  elapsedtime.month = starttime.month - stoptime.month;
+  elapsedtime.weekDay = starttime.weekDay - stoptime.weekDay;
+  elapsedtime.year = starttime.year - stoptime.year;
+  elapsedtime.hour = starttime.hour - stoptime.hour;
+  elapsedtime.minute = starttime.minute - stoptime.minute;
+  elapsedtime.second = starttime.second - stoptime.second;
+
   Serial.print("Elapsed duration: ");
 
-  elapsedtime.month = 
-
-  Serial.print(thetime.month);
-    Serial.print("/");
-    Serial.print(thetime.weekDay);
-    Serial.print("/");
-    Serial.print(thetime.year);
-    Serial.print(" ");
-    Serial.print(thetime.hour);
-    Serial.print(":");
-    Serial.print(thetime.minute);
-    Serial.print(":");
-    Serial.println(thetime.second);
+  Serial.print(elapsedtime.month);
+  Serial.print("/");
+  Serial.print(elapsedtime.weekDay);
+  Serial.print("/");
+  Serial.print(elapsedtime.year);
+  Serial.print(" ");
+  Serial.print(elapsedtime.hour);
+  Serial.print(":");
+  Serial.print(elapsedtime.minute);
+  Serial.print(":");
+  Serial.println(elapsedtime.second);
   
 }
 
