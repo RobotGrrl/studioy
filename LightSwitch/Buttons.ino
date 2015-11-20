@@ -8,13 +8,13 @@ void updateDButton() {
   if(button_D_prev == LOW && button_D_current == HIGH && current_time-button_D_up > 20) {
     button_D_down = current_time;
     button_D_state = 1;
-    Serial.println("DETAIL!");
+    if(LOG_LEVEL == 0) Serial.println("DETAIL!");
     dButtonPressed();
   }
 
   if(button_D_prev == HIGH && button_D_current == LOW && current_time-button_D_down > 20) {
     button_D_state = 0;
-    Serial.println("DETAIL! released");
+    if(LOG_LEVEL == 0) Serial.println("DETAIL! released");
     button_lock = false;
     msg_displayed = false;
     dButtonReleased();
@@ -25,7 +25,7 @@ void updateDButton() {
     // holding
     long holding_D = current_time-button_D_down;
     button_D_state = 2;
-    Serial.print("DETAIL! "); Serial.println(holding_D);
+    if(LOG_LEVEL == 0) { Serial.print("DETAIL! "); Serial.println(holding_D); }
   }
 
 }
@@ -39,13 +39,13 @@ void updateOnButton() {
   if(button_L_prev == LOW && button_L_current == HIGH && current_time-button_L_up > 20) {
     button_L_down = current_time;
     button_L_state = 1;
-    Serial.println("ON!");
+    if(LOG_LEVEL == 0) Serial.println("ON!");
     onButtonPressed();
   }
 
   if(button_L_prev == HIGH && button_L_current == LOW && current_time-button_L_down > 20) {
     button_L_state = 0;
-    Serial.println("ON! released");
+    if(LOG_LEVEL == 0) Serial.println("ON! released");
     button_lock = false;
     msg_displayed = false;
     onButtonReleased();
@@ -58,7 +58,7 @@ void updateOnButton() {
     // holding
     long holding_L = current_time-button_L_down;
     button_L_state = 2;
-    Serial.print("ON! "); Serial.println(holding_L);
+    if(LOG_LEVEL == 0) Serial.print("ON! "); Serial.println(holding_L);
 
     button_lock = true;
 
@@ -175,14 +175,14 @@ void updateOffButton() {
   if(button_R_prev == LOW && button_R_current == HIGH && current_time-button_R_down > 20) {
     button_R_down = current_time;
     button_R_state = 1;
-    Serial.print("OFF!");
+    if(LOG_LEVEL == 0) Serial.print("OFF!");
     offButtonPressed();
   }
 
 
   if(button_R_prev == HIGH && button_R_current == LOW && current_time-button_R_down > 20) {
     button_R_state = 0;
-    Serial.println("OFF! released");
+    if(LOG_LEVEL == 0) Serial.println("OFF! released");
     offButtonReleased();    
 
       if(CURRENT_STATE == CYCLE_MODE) {
@@ -225,7 +225,7 @@ void updateOffButton() {
         // holding
         long holding_R = current_time-button_R_down;
         button_R_state = 2;
-        Serial.print("OFF! "); Serial.println(holding_R);
+        if(LOG_LEVEL == 0) Serial.print("OFF! "); Serial.println(holding_R);
       }
 
   }
@@ -248,8 +248,13 @@ void onButtonPressed() {
     servoTurnLightOn();
 
     // output some data
-    Serial.print("Light turned on: ");
-    printTheTime();
+    if(LOG_LEVEL >= 0) Serial.print("Light turned on: ");
+    if(LOG_LEVEL >= 0) printTheTime();
+  }
+
+  if(CURRENT_STATE == TIMER_MODE) {
+    light_on = true;
+    servoTurnLightOn();  
   }
   
 }
@@ -266,6 +271,12 @@ void offButtonReleased() {
   
   servoTurnLightOff();
   digitalWrite(led_R, LOW);
+
+  if(light_on) {
+    // it was on, now it's off - increment the counter
+    num_times_turned_on++;
+  }
+  
   light_on  = false;
 
   readRTC();
@@ -278,8 +289,8 @@ void offButtonReleased() {
     digitalWrite(led_L, LOW);
 
     // output some data
-    Serial.print("Light turned off: ");
-    printTheTime();
+    if(LOG_LEVEL >= 0) Serial.print("Light turned off: ");
+    if(LOG_LEVEL >= 0) printTheTime();
   }
 
   // calculating how long the light has been on for
@@ -290,6 +301,10 @@ void offButtonReleased() {
   Serial.print(light_duration);
   Serial.print("s) ");
   printConvertToHMS(light_duration);
+  Serial.print("\n");
+
+  Serial.print("Number of times turned on: ");
+  Serial.print(num_times_turned_on);
   Serial.print("\n");
 
 }
@@ -307,7 +322,15 @@ void dButtonReleased() {
   delay(80);
 
   mode_press++;
-  if(mode_press > 3) mode_press = 0;
+  if(mode_press > 4) mode_press = 0;
+
+  /*
+  const int CYCLE_MODE = 3;
+  const int LIVE_MODE = 4;
+  const int TIMER_MODE = 5;
+  const int AMBIENT_MODE = 6;
+  const int CREDITS_MODE = 7;
+   */
 
   if(mode_press == 0) {
     last_update_live_mode = 0;
@@ -318,13 +341,18 @@ void dButtonReleased() {
     last_msg_flip = 0;
     CURRENT_STATE = CYCLE_MODE;
   }
-  
+
   if(mode_press == 2) {
+    last_update = 0;
+    CURRENT_STATE = TIMER_MODE;
+  }
+  
+  if(mode_press == 3) {
     last_update = 0;
     CURRENT_STATE = AMBIENT_MODE;
   }
   
-  if(mode_press == 3) {
+  if(mode_press == 4) {
     cur_msg = 9; // just hacking how it advances quickly at the start
     last_msg_flip = 0;
     CURRENT_STATE = CREDITS_MODE;

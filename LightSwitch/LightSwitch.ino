@@ -12,6 +12,8 @@ rgb_lcd lcd;
 Servo myservo;
 dht DHT;
 
+const int LOG_LEVEL = 1; // 0 = debug, 1 = release
+
 // pins
 // lcd is on i2c
 const int button_L = 8; // green aka on
@@ -32,9 +34,10 @@ const int MESSAGE_STATE = 1;
 const int MESSAGES_TEST = 2;
 const int CYCLE_MODE = 3;
 const int LIVE_MODE = 4;
-const int AMBIENT_MODE = 5;
-const int CREDITS_MODE = 6;
-int CURRENT_STATE = LIVE_MODE;
+const int TIMER_MODE = 5;
+const int AMBIENT_MODE = 6;
+const int CREDITS_MODE = 7;
+int CURRENT_STATE = TIMER_MODE;
 
 // vars
 int mode = 0;
@@ -67,7 +70,7 @@ int message_ind = 0;
 
 long button_hold_start_time = 0;
 boolean button_hold = false;
-int mode_press = 0;
+int mode_press = 2;
 
 
 long last_tou_change = 0;
@@ -110,7 +113,7 @@ RTC thetime = { 0, 0, 0, 0, 0, 0, 0 };
 void setup() {
   Wire.begin();
   Serial.begin(9600);
-  Serial.println("* * * Hello! I am Lumenbot! * * *");
+  if(LOG_LEVEL >= 0) Serial.println("* * * Hello! I am Lumenbot! * * *");
   lcd.begin(16,2);
   
   //myservo.attach(servo_pin);
@@ -165,6 +168,66 @@ void loop() {
 
   if(CURRENT_STATE == AMBIENT_MODE) {
     ambientMode();
+  }
+
+
+  if(CURRENT_STATE == TIMER_MODE) {
+
+    lcdSetColour(255, 233, 66);
+
+    if(light_on) {
+
+      readRTC();
+      int current_s = convertToSeconds(thetime.hour, thetime.minute, thetime.second);
+      if(current_s-light_start_s >= 10) {
+        // turn the light off now
+        offButtonReleased();
+      }
+
+      if(current_time-last_update >= 1000) {
+        
+        String s1 = "Lumenbot will ";
+        String s2 = "turn off in ";
+
+        int turn_off_in = 10 - (current_s-light_start_s);
+        String s_meep = (String)turn_off_in;
+  
+        lcd.clear();
+    
+        lcd.setCursor(calcCenter(s1), 0);
+        lcd.print(s1);
+        
+        lcd.setCursor(0, 1);
+        lcd.print(s2);
+
+        lcd.setCursor(12, 1);
+        lcd.print(s_meep);
+
+        last_update = current_time;
+
+      }
+      
+    } else {
+
+      if(current_time-last_update >= 1000) {
+        
+        String s1 = "ActivateLumenbot";
+        String s2 = "for 10s";
+  
+        lcd.clear();
+    
+        lcd.setCursor(calcCenter(s1), 0);
+        lcd.print(s1);
+        
+        lcd.setCursor(calcCenter(s2), 1);
+        lcd.print(s2);
+
+        last_update = current_time;
+      
+      }
+      
+    }
+    
   }
 
 

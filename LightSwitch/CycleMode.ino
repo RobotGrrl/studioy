@@ -22,11 +22,11 @@ void cycleMode() {
      } else if(tou_state == 2) {
        lcdSetColour(255, 10, 10);
      }
+ 
+     lcd.clear();
+     lcd.home();
 
      if(cur_msg == 0) {
-
-        lcd.clear();
-        lcd.home();
 
         readDHT22();
         String s1 = "Temp: " + (String)DHT.temperature + " C";
@@ -38,9 +38,6 @@ void cycleMode() {
       
      } else if(cur_msg == 1) {
 
-        lcd.clear();
-        lcd.home();
-  
         lcd.print("Grid status:");
         lcd.setCursor(0, 1);
       
@@ -55,9 +52,6 @@ void cycleMode() {
       
      } else if(cur_msg == 2) {
 
-        lcd.clear();
-        lcd.home();
-    
         lcd.print("The grid is");
         lcd.setCursor(0, 1);
 
@@ -71,8 +65,6 @@ void cycleMode() {
 
      } else if(cur_msg == 3) {
 
-        lcd.clear();
-        lcd.home();
         lcd.print("Electricity rate:");
         lcd.setCursor(0, 1);
 

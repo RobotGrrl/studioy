@@ -97,7 +97,7 @@ if(current_time-last_update_live_mode < 1000) return;
     lcd.print(s1);
     
     lcd.setCursor(calcCenter(s2), 1);
-    lcd.print(s2);    
+    lcd.print(s2);
     
   }
 
