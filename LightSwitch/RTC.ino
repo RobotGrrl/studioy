@@ -60,33 +60,42 @@ void readRTC() {
   
 }
 
+int convertToSeconds(int h, int m, int s) {
+  int total = (h*3600) + (m*60) + s;
+  return total;
+}
 
-void displayTimeDuration() {
+void printConvertToHMS(int total) {
+  int num_hours = (int)(total/3600);
+  int num_mins = (int)( (total - (num_hours*3600) ) / 60);
+  int num_secs = total - (num_hours*3600) - (num_mins*60);
 
-  elapsedtime.month = starttime.month - stoptime.month;
-  elapsedtime.weekDay = starttime.weekDay - stoptime.weekDay;
-  elapsedtime.year = starttime.year - stoptime.year;
-  elapsedtime.hour = starttime.hour - stoptime.hour;
-  elapsedtime.minute = starttime.minute - stoptime.minute;
-  elapsedtime.second = starttime.second - stoptime.second;
-
-  Serial.print("Elapsed duration: ");
-
-  Serial.print(elapsedtime.month);
-  Serial.print("/");
-  Serial.print(elapsedtime.weekDay);
-  Serial.print("/");
-  Serial.print(elapsedtime.year);
-  Serial.print(" ");
-  Serial.print(elapsedtime.hour);
+  if(num_hours < 10) Serial.print("0");
+  Serial.print(num_hours);
   Serial.print(":");
-  Serial.print(elapsedtime.minute);
+  if(num_mins < 10) Serial.print("0");
+  Serial.print(num_mins);
   Serial.print(":");
-  Serial.println(elapsedtime.second);
-  
+  if(num_secs < 10) Serial.print("0");
+  Serial.print(num_secs);
 }
 
 
-
+void printTheTime() {
+  Serial.print(thetime.month);
+  Serial.print("/");
+  Serial.print(thetime.weekDay);
+  Serial.print("/");
+  Serial.print(thetime.year);
+  Serial.print(" ");
+  if(thetime.hour < 10) Serial.print("0");
+  Serial.print(thetime.hour);
+  Serial.print(":");
+  if(thetime.minute < 10) Serial.print("0");
+  Serial.print(thetime.minute);
+  Serial.print(":");
+  if(thetime.second < 10) Serial.print("0");
+  Serial.println(thetime.second);
+}
 
 

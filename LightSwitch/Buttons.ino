@@ -64,132 +64,103 @@ void updateOnButton() {
 
     if(CURRENT_STATE == CYCLE_MODE) {
 
-    if(tou_state == 0) {
-
-          if(!msg_displayed) {
-            lcd.setPWM(REG_RED, 10);
-            lcd.setPWM(REG_GREEN, 255);
-            lcd.setPWM(REG_BLUE, 10);
+      lcd.clear();
+      lcd.home();
   
-            lcd.clear();
-            lcd.home();
-      
-            lcd.print("Hold for");
-            lcd.setCursor(0, 1);
-            lcd.print("5 seconds");
-          }
-
+      if(tou_state == 0) {
+  
+        if(!msg_displayed) {
+          lcdSetColour(10, 255, 10);
+    
+          lcd.setCursor(0, 0);
+          lcd.print("Hold for");
+          lcd.setCursor(0, 1);
+          lcd.print("5 seconds");
+        }
+    
+        lcd.setCursor(15, 1);
+        if(holding_L >= 4000) {
+          lcd.print("1");
+        } else if(holding_L >= 3000) {
+          lcd.print("2");
+        } else if(holding_L >= 2000) {
+          lcd.print("3");
+        } else if(holding_L >= 1000) {
+          lcd.print("4");
+        } else if(holding_L >= 0) {
+          lcd.print("5");
+        }
+  
+        if(holding_L >= long(5*1000)) {
+    
+          lcd.setCursor(0, 0);
+          lcd.print("Lumenbot");
+          lcd.setCursor(0, 1);
+          lcd.print("activated");
+    
+          light_on = true;
           
-
-          lcd.setCursor(15, 1);
-          if(holding_L >= 4000) {
+          servoTurnLightOn();
+          digitalWrite(led_L, LOW);
+        }
+            
+      } else if(tou_state == 1) {
+    
+        if(!msg_displayed) {
+          lcdSetColour(200, 200, 10);
+    
+          lcd.setCursor(0, 0);
+          lcd.print("Hold for");
+          lcd.setCursor(0, 1);
+          lcd.print("7 seconds");
+        }
+  
+        lcd.setCursor(15, 1);
+        if(holding_L >= 6000) {
             lcd.print("1");
-          } else if(holding_L >= 3000) {
+          } else if(holding_L >= 5000) {
             lcd.print("2");
-          } else if(holding_L >= 2000) {
+          } else if(holding_L >= 4000) {
             lcd.print("3");
-          } else if(holding_L >= 1000) {
+          } else if(holding_L >= 3000) {
             lcd.print("4");
-          } else if(holding_L >= 0) {
+          } else if(holding_L >= 2000) {
             lcd.print("5");
+          } else if(holding_L >= 1000) {
+            lcd.print("6");
+          } else if(holding_L >= 0) {
+            lcd.print("7");
           }
-
-
-
-           if(holding_L >= long(5*1000)) {
-
-            lcd.clear();
-            lcd.home();
-      
-            lcd.print("Lumenbot");
-            lcd.setCursor(0, 1);
-            lcd.print("activated");
-
-              light_on = true;
-            
-             myservo.attach(servo_pin);
-              myservo.write(strike_up);
-              delay(500);
-              myservo.detach();
-            digitalWrite(led_L, LOW);
-          }
-          
-          
-        } else if(tou_state == 1) {
-
-          if(!msg_displayed) {
-            lcd.setPWM(REG_RED, 200);
-            lcd.setPWM(REG_GREEN, 200);
-            lcd.setPWM(REG_BLUE, 10);
-          
-            lcd.clear();
-            lcd.home();
-      
-            lcd.print("Hold for");
-            lcd.setCursor(0, 1);
-            lcd.print("7 seconds");
-            
-
-          }
-
-
-            lcd.setCursor(15, 1);
-          if(holding_L >= 6000) {
-              lcd.print("1");
-            } else if(holding_L >= 5000) {
-              lcd.print("2");
-            } else if(holding_L >= 4000) {
-              lcd.print("3");
-            } else if(holding_L >= 3000) {
-              lcd.print("4");
-            } else if(holding_L >= 2000) {
-              lcd.print("5");
-            } else if(holding_L >= 1000) {
-              lcd.print("6");
-            } else if(holding_L >= 0) {
-              lcd.print("7");
-            }
-
-
-
+  
           if(holding_L >= long(7*1000)) {
-
-            lcd.clear();
-            lcd.home();
-      
+  
+            lcd.setCursor(0, 0);
             lcd.print("Lumenbot");
             lcd.setCursor(0, 1);
             lcd.print("activated");
-
+  
             light_on = true;
             
-             myservo.attach(servo_pin);
-              myservo.write(strike_up);
-              delay(500);
-              myservo.detach();
+            servoTurnLightOn();
              digitalWrite(led_L, LOW);
           }
-          
-        } else if(tou_state == 2) {
-
-          if(!msg_displayed) {
-            lcd.setPWM(REG_RED, 255);
-            lcd.setPWM(REG_GREEN, 10);
-            lcd.setPWM(REG_BLUE, 10);
             
-            lcd.clear();
-            lcd.home();
+    } else if(tou_state == 2) {
+  
+      if(!msg_displayed) {
+        lcdSetColour(255, 10, 10);
+  
+        lcd.setCursor(0, 0);
+        lcd.print("Peak capacity-");
+        lcd.setCursor(0, 1);
+        lcd.print("On is disabled");
+      }
       
-            lcd.print("Peak capacity-");
-            lcd.setCursor(0, 1);
-            lcd.print("On is disabled");
-          }
-          
-        }
-
+    }
+  
     if(!msg_displayed) msg_displayed = true;
-    
-  }
+      
+    }
 
   }
   
@@ -209,71 +180,55 @@ void updateOffButton() {
   }
 
 
-
-
   if(button_R_prev == HIGH && button_R_current == LOW && current_time-button_R_down > 20) {
     button_R_state = 0;
     Serial.println("OFF! released");
     offButtonReleased();    
 
-
       if(CURRENT_STATE == CYCLE_MODE) {
-
-      if(tou_state == 0) {
-
-          lcd.setPWM(REG_RED, 10);
-          lcd.setPWM(REG_GREEN, 255);
-          lcd.setPWM(REG_BLUE, 10);
-
-          light_on = false;
+  
+        light_on = false;
           
-          lcd.clear();
-          lcd.home();
-
-          lcd.print("Thank you!");
-          
-        } else if(tou_state == 1) {
-
-          lcd.setPWM(REG_RED, 200);
-          lcd.setPWM(REG_GREEN, 200);
-          lcd.setPWM(REG_BLUE, 10);
-
-          light_on = false;
-        
-          lcd.clear();
-          lcd.home();
+        lcd.clear();
+        lcd.home();
+  
+        if(tou_state == 0) {
     
-          lcd.print("Thank you!");
-          
-        } else if(tou_state == 2) {
-
-          lcd.setPWM(REG_RED, 255);
-          lcd.setPWM(REG_GREEN, 10);
-          lcd.setPWM(REG_BLUE, 10);
-
-          light_on = false;
-          
-          lcd.clear();
-          lcd.home();
+            lcdSetColour(10, 255, 10);
+            
+            lcd.setCursor(0, 0);
+            lcd.print("Thank you!");
+            
+          } else if(tou_state == 1) {
     
-          lcd.print("Try again when");
-          lcd.setCursor(0, 1);
-          lcd.print("not on peak load");
-          
-        }
-
+            lcdSetColour(200, 200, 10);
+    
+            lcd.setCursor(0, 0);
+            lcd.print("Thank you!");
+            
+          } else if(tou_state == 2) {
+    
+            lcdSetColour(255, 10, 10);
+    
+            lcd.setCursor(0, 0);
+            lcd.print("Try again when");
+            lcd.setCursor(0, 1);
+            lcd.print("not on peak load");
+            
+          }
+  
       }
-      
+    
+    
+      // wait 100ms before saying that the button is being held down
+      if(button_R_prev == HIGH && button_R_current == HIGH && current_time-button_R_down > 20) {
+        // holding
+        long holding_R = current_time-button_R_down;
+        button_R_state = 2;
+        Serial.print("OFF! "); Serial.println(holding_R);
+      }
 
-  // wait 100ms before saying that the button is being held down
-  if(button_R_prev == HIGH && button_R_current == HIGH && current_time-button_R_down > 20) {
-    // holding
-    long holding_R = current_time-button_R_down;
-    button_R_state = 2;
-    Serial.print("OFF! "); Serial.println(holding_R);
   }
-
-}
   
 }
 
@@ -282,8 +237,11 @@ void onButtonPressed() {
   digitalWrite(led_L, HIGH);
 
   readRTC();
+  
   light_on_time = thetime.minute + (60*thetime.hour);
 
+  light_start_s = convertToSeconds(thetime.hour, thetime.minute, thetime.second);
+  
   if(CURRENT_STATE == LIVE_MODE) {
     light_on_seconds = thetime.second + (60*thetime.minute) + (60*60*thetime.hour);
     light_on = true;
@@ -291,27 +249,7 @@ void onButtonPressed() {
 
     // output some data
     Serial.print("Light turned on: ");
-    
-    Serial.print(thetime.month);
-    Serial.print("/");
-    Serial.print(thetime.weekDay);
-    Serial.print("/");
-    Serial.print(thetime.year);
-    Serial.print(" ");
-    Serial.print(thetime.hour);
-    Serial.print(":");
-    Serial.print(thetime.minute);
-    Serial.print(":");
-    Serial.println(thetime.second);
-
-    // for calculating the difference
-    stoptime.month = thetime.month;
-    stoptime.monthDay = thetime.monthDay;
-    stoptime.year = thetime.year;
-    stoptime.hour = thetime.hour;
-    stoptime.minute = thetime.minute;
-    stoptime.second = thetime.second;
-
+    printTheTime();
   }
   
 }
@@ -326,82 +264,33 @@ void onButtonReleased() {
 
 void offButtonReleased() {
   
-  myservo.attach(servo_pin);
-  myservo.write(strike_down);
-  delay(500);
-  myservo.detach();
-  
+  servoTurnLightOff();
   digitalWrite(led_R, LOW);
-
-  // read the RTC
-  Wire.beginTransmission(DS1307_ADDRESS);
-  Wire.write(zero);
-  Wire.endTransmission();
-
-  Wire.requestFrom(DS1307_ADDRESS, 7);
-
-  int second = bcdToDec(Wire.read());
-  int minute = bcdToDec(Wire.read());
-  int hour = bcdToDec(Wire.read() & 0b111111); //24 hour time
-  int weekDay = bcdToDec(Wire.read()); //0-6 -> sunday - Saturday
-  int monthDay = bcdToDec(Wire.read());
-  int month = bcdToDec(Wire.read());
-  int year = bcdToDec(Wire.read());
-
-  light_off_time = minute + (60*hour);
-
-  total_light_on_time = abs(light_off_time - light_on_time);
-
-  Serial.print("the light was on for a total of ");
-  Serial.print(total_light_on_time);
-  Serial.println(" mins");
-
   light_on  = false;
 
-
-
   readRTC();
-  
 
+  // this was probably in minutes, now it's seconds... have to clean this code
+  light_off_time = convertToSeconds(thetime.hour, thetime.minute, thetime.second);
+  
   if(CURRENT_STATE == LIVE_MODE) {
     servoTurnLightOff();
     digitalWrite(led_L, LOW);
 
     // output some data
     Serial.print("Light turned off: ");
-    
-    Serial.print(thetime.month);
-    Serial.print("/");
-    Serial.print(thetime.weekDay);
-    Serial.print("/");
-    Serial.print(thetime.year);
-    Serial.print(" ");
-    Serial.print(thetime.hour);
-    Serial.print(":");
-    Serial.print(thetime.minute);
-    Serial.print(":");
-    Serial.println(thetime.second);
-
-    // for calculating the difference
-    stoptime.month = thetime.month;
-    stoptime.monthDay = thetime.monthDay;
-    stoptime.year = thetime.year;
-    stoptime.hour = thetime.hour;
-    stoptime.minute = thetime.minute;
-    stoptime.second = thetime.second;
-
-    displayTimeDuration();
-
+    printTheTime();
   }
 
-  // TODO:
-  // display this to lcd screen
-  // save data to eeprom
-  // eventually implement timer functionality
+  // calculating how long the light has been on for
+  light_end_s = convertToSeconds(thetime.hour, thetime.minute, thetime.second);
+  light_duration = abs(light_end_s - light_start_s);
 
-  // other things needed in eeprom:
-  // current light state (on or off)
-  // number of times light turned on & off
+  Serial.print("Elapsed duration (");
+  Serial.print(light_duration);
+  Serial.print("s) ");
+  printConvertToHMS(light_duration);
+  Serial.print("\n");
 
 }
 

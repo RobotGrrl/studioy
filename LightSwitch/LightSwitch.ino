@@ -89,6 +89,12 @@ int current_time_seconds = 0;
 int elapsed_on_time = 0;
 int elapsed_on_mins = 0;
 
+int light_duration = 0; // there's like 5 variables that are all doing the same thing ... fix it soon
+int light_start_s = 0;
+int light_end_s = 0;
+
+uint16_t num_times_turned_on = 0;
+
 struct RTC {
   int second;
   int minute;
@@ -100,11 +106,6 @@ struct RTC {
 };
 
 RTC thetime = { 0, 0, 0, 0, 0, 0, 0 };
-
-RTC starttime = { 0, 0, 0, 0, 0, 0, 0 };
-RTC stoptime = { 0, 0, 0, 0, 0, 0, 0 };
-RTC elapsedtime = { 0, 0, 0, 0, 0, 0, 0 };
-
 
 void setup() {
   Wire.begin();
@@ -134,31 +135,6 @@ void setup() {
   delay(80);
   playTone(300, 80);
   delay(80);
-
-
-
-  // just trying out some math
-
-  int h1 = 1; // 3600
-  int m1 = 30; // 1800
-  int s1 = 29; // 29
-
-  int total_s1 = (h1*3600) + (m1*60) + s1;
-  Serial.print("total_s1 ");
-  Serial.println(total_s1);
-
-  int num_hours = (int) ( total_s1 / 3600 );
-  int num_mins = (int)( ( total_s1 - (num_hours*3600) ) / 60 );
-  int num_s = total_s1 - (num_hours*3600) - (num_mins*60);
-
-  Serial.print("num_hours ");
-  Serial.println(num_hours);
-
-  Serial.print("num_mins ");
-  Serial.println(num_mins);
-
-  Serial.print("num_s ");
-  Serial.println(num_s);
 
 }
 
