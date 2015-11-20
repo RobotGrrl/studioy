@@ -109,7 +109,7 @@ RTC elapsedtime = { 0, 0, 0, 0, 0, 0, 0 };
 void setup() {
   Wire.begin();
   Serial.begin(9600);
-  Serial.print("* * * Hello! I am Lumenbot! * * *");
+  Serial.println("* * * Hello! I am Lumenbot! * * *");
   lcd.begin(16,2);
   
   //myservo.attach(servo_pin);
@@ -134,6 +134,32 @@ void setup() {
   delay(80);
   playTone(300, 80);
   delay(80);
+
+
+
+  // just trying out some math
+
+  int h1 = 1; // 3600
+  int m1 = 30; // 1800
+  int s1 = 29; // 29
+
+  int total_s1 = (h1*3600) + (m1*60) + s1;
+  Serial.print("total_s1 ");
+  Serial.println(total_s1);
+
+  int num_hours = (int) ( total_s1 / 3600 );
+  int num_mins = (int)( ( total_s1 - (num_hours*3600) ) / 60 );
+  int num_s = total_s1 - (num_hours*3600) - (num_mins*60);
+
+  Serial.print("num_hours ");
+  Serial.println(num_hours);
+
+  Serial.print("num_mins ");
+  Serial.println(num_mins);
+
+  Serial.print("num_s ");
+  Serial.println(num_s);
+
 }
 
 void loop() {
